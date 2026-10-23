@@ -2,6 +2,8 @@
 
 #include <raylib.h>
 
+#include "board.hpp"
+
 class Game {
   public:
 	void Init();
@@ -10,4 +12,5 @@ class Game {
 	void Render();
 
   private:
+	Board board;
 };
