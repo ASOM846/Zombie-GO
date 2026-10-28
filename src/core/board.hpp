@@ -32,8 +32,8 @@ class Board {
 	const int boardY = 3;
 	const int boardX = 3;
 
-	int cellHeight = 150;
-	int cellWidth = 100;
+	int cellHeight = 266;
+	int cellWidth = 200;
 
 	const int spacing = 100;
 };

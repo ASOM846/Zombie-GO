@@ -185,8 +185,12 @@ Vector2 Board::GetPlayerPos() {
 std::shared_ptr<Card> Board::GetRandomCard() {
 	int seed = GetRandomValue(0, 10);
 
-	if (seed >= 7) {
+	if (seed >= 9) {
 		return std::make_shared<SwordCard>();
+	}
+
+	if (seed >= 7) {
+		return std::make_shared<HealthPotionCard>();
 	}
 
 	return std::make_shared<EnemyCard>();
