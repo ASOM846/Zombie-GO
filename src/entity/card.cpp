@@ -62,19 +62,19 @@ void Card::Render(Vector2 position, Vector2 cellSize) {
 	DrawCircle(bl.x, bl.y, niteRadius, darkWood);
 	DrawCircle(br.x, br.y, niteRadius, darkWood);
 
-	// int fontSize = 20;
-	// const char *name = topCard->name.c_str();
-	// int textWidth = MeasureText(name, fontSize);
-	// int texX = position.x + width / 2 - textWidth / 2;
-	// DrawText(name, texX, position.y + 16, fontSize, {40, 20, 10, 255});
-	//
-	// const float sepY = position.y + 42;
-	// DrawLineEx({position.x + 14, sepY}, {position.x + width - 14, sepY}, 2,
-	// 		   goldAccent);
-	// DrawCircle(position.x + 14, sepY, 2, darkWood);
-	// DrawCircle(position.x + width - 14, sepY, 2, darkWood);
-	//
-	// const char *valueStr;
+	int fontSize = 20;
+	const char *text = name.c_str();
+	int textWidth = MeasureText(text, fontSize);
+	int texX = position.x + width / 2 - textWidth / 2;
+	DrawText(text, texX, position.y + 16, fontSize, {40, 20, 10, 255});
+
+	const float sepY = position.y + 42;
+	DrawLineEx({position.x + 14, sepY}, {position.x + width - 14, sepY}, 2,
+			   goldAccent);
+	DrawCircle(position.x + 14, sepY, 2, darkWood);
+	DrawCircle(position.x + width - 14, sepY, 2, darkWood);
+
+	const char *valueStr = GetValueText().c_str();
 	// if (topCard->maxValue == -1 || topCard->minValue == -1) {
 	// 	valueStr = TextFormat("%d", topCard->hp);
 	// } else {
@@ -84,30 +84,31 @@ void Card::Render(Vector2 position, Vector2 cellSize) {
 	// if (topCard->type == CardType::PLAYER) {
 	// 	valueStr = TextFormat("%d | %d", topCard->hp, topCard->maxValue);
 	// }
+
+	const float sepYBottom = position.y + height - 46;
+	DrawLineEx({position.x + 14, sepYBottom},
+			   {position.x + width - 14, sepYBottom}, 2, goldAccent);
+	DrawCircle(position.x + 14, sepYBottom, 2, darkWood);
+	DrawCircle(position.x + width - 14, sepYBottom, 2, darkWood);
 	//
-	// const float sepYBottom = position.y + height - 46;
-	// DrawLineEx({position.x + 14, sepYBottom},
-	// 		   {position.x + width - 14, sepYBottom}, 2, goldAccent);
-	// DrawCircle(position.x + 14, sepYBottom, 2, darkWood);
-	// DrawCircle(position.x + width - 14, sepYBottom, 2, darkWood);
-	//
-	// fontSize = 24;
-	// textWidth = MeasureText(valueStr, fontSize);
-	// int valTextX = centerX - textWidth / 2;
-	// int valTextY = sepYBottom + 8;
-	//
-	// auto valueColor = Color{50, 30, 20, 255};
+	fontSize = 24;
+	textWidth = MeasureText(valueStr, fontSize);
+	int valTextX = centerX - textWidth / 2;
+	int valTextY = sepYBottom + 8;
+
+	auto valueColor = Color{50, 30, 20, 255};
 	// if (topCard->type == CardType::ENEMY)
 	// 	valueColor = Color{150, 25, 25, 255};
 	// if (topCard->type == CardType::POTION)
 	// 	valueColor = Color{25, 110, 25, 255};
-	//
-	// DrawText(valueStr, valTextX, valTextY, fontSize, valueColor);
+
+	DrawText(valueStr, valTextX, valTextY, fontSize, valueColor);
 
 	RenderContent(position, cellSize);
 }
 
 PlayerCard::PlayerCard() {
+	name = "PLAYER";
 	attackPower = 5;
 	maxHp = 100;
 
@@ -115,6 +116,7 @@ PlayerCard::PlayerCard() {
 }
 
 void PlayerCard::RenderContent(Vector2 offset, Vector2 cellSize) {
+	DrawRectangleLines(offset.x, offset.y, cellSize.x, cellSize.y, GOLD);
 	const char *value = std::to_string(hp).c_str();
 
 	DrawText(value, offset.x + 30, offset.y + 20, 30, GREEN);
@@ -124,10 +126,16 @@ void PlayerCard::RenderContent(Vector2 offset, Vector2 cellSize) {
 	DrawText(attackValue, offset.x + 30, offset.y + 60, 30, RED);
 }
 
+std::string PlayerCard::GetValueText() const {
+	return std::string{std::to_string(hp) + "  |  " +
+					   std::to_string(attackPower)};
+}
+
 bool PlayerCard::Interact(PlayerCard &player) {}
 
 EnemyCard::EnemyCard() {
 	hp = GetRandomValue(1, 6);
+	name = "ENEMY";
 
 	auto GetRandomColor = []() {
 		std::vector<Color> colors{RED,	  GREEN,  BLUE,	 MAGENTA,
@@ -145,6 +153,10 @@ void EnemyCard::RenderContent(Vector2 offset, Vector2 cellSize) {
 	const char *value = std::to_string(hp).c_str();
 
 	DrawText(value, offset.x + 30, offset.y + 20, 30, WHITE);
+}
+
+std::string EnemyCard::GetValueText() const {
+	return std::to_string(hp);
 }
 
 bool EnemyCard::Interact(PlayerCard &player) {
@@ -179,15 +191,20 @@ bool EnemyCard::Interact(PlayerCard &player) {
 }
 
 SwordCard::SwordCard() {
+	name = "WEAPON";
 	attack = GetRandomValue(3, 10);
 }
 
 void SwordCard::RenderContent(Vector2 offset, Vector2 cellSize) {
-	DrawRectangleLines(offset.x, offset.y, cellSize.x, cellSize.y, YELLOW);
+	DrawRectangleLines(offset.x, offset.y, cellSize.x, cellSize.y, LIGHTGRAY);
 
 	const char *value = std::to_string(attack).c_str();
 
 	DrawText(value, offset.x + 30, offset.y + 20, 30, WHITE);
+}
+
+std::string SwordCard::GetValueText() const {
+	return std::to_string(attack);
 }
 
 bool SwordCard::Interact(PlayerCard &player) {
@@ -197,11 +214,12 @@ bool SwordCard::Interact(PlayerCard &player) {
 }
 
 HealthPotionCard::HealthPotionCard() {
+	name = "HP POTION";
 	amount = GetRandomValue(3, 12);
 }
 
 void HealthPotionCard::RenderContent(Vector2 offset, Vector2 cellSize) {
-	DrawRectangleLines(offset.x, offset.y, cellSize.x, cellSize.y, GREEN);
+	DrawRectangleLines(offset.x, offset.y, cellSize.x, cellSize.y, RED);
 
 	std::string title = "HP";
 	DrawText(title.c_str(), offset.x + 30, offset.y + 20, 20, WHITE);
@@ -209,6 +227,10 @@ void HealthPotionCard::RenderContent(Vector2 offset, Vector2 cellSize) {
 	const char *value = std::to_string(amount).c_str();
 
 	DrawText(value, offset.x + 30, offset.y + 60, 30, WHITE);
+}
+
+std::string HealthPotionCard::GetValueText() const {
+	return std::to_string(amount);
 }
 
 bool HealthPotionCard::Interact(PlayerCard &player) {

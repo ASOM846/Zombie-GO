@@ -1,6 +1,7 @@
 #pragma once
 
 #include <raylib.h>
+#include <string>
 
 class PlayerCard;
 
@@ -14,10 +15,13 @@ class Card {
   protected:
 	virtual void RenderContent(Vector2 offset, Vector2 cellSize) = 0;
 
+	[[nodiscard]] virtual std::string GetValueText() const = 0;
+
   public:
 	virtual bool Interact(PlayerCard &player) = 0;
 
 	int hp;
+	std::string name;
 };
 
 class PlayerCard : public Card {
@@ -26,6 +30,8 @@ class PlayerCard : public Card {
 	~PlayerCard() override = default;
 
 	void RenderContent(Vector2 offset, Vector2 cellSize) override;
+
+	[[nodiscard]] std::string GetValueText() const override;
 
 	bool Interact(PlayerCard &player) override;
 
@@ -40,6 +46,8 @@ class EnemyCard : public Card {
 
 	void RenderContent(Vector2 position, Vector2 cellSize) override;
 
+	[[nodiscard]] std::string GetValueText() const override;
+
 	bool Interact(PlayerCard &player) override;
 
 	Color color;
@@ -52,6 +60,8 @@ class SwordCard : public Card {
 
 	void RenderContent(Vector2 offset, Vector2 cellSize) override;
 
+	[[nodiscard]] std::string GetValueText() const override;
+
 	bool Interact(PlayerCard &player) override;
 
 	int attack;
@@ -63,6 +73,8 @@ class HealthPotionCard : public Card {
 	~HealthPotionCard() override = default;
 
 	void RenderContent(Vector2 offset, Vector2 cellSize) override;
+
+	[[nodiscard]] std::string GetValueText() const override;
 
 	bool Interact(PlayerCard &player) override;
 
