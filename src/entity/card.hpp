@@ -40,6 +40,10 @@ class PlayerCard : public Card {
 	std::shared_ptr<SwordCard> currentWeapon;
 
 	int maxHp;
+
+	int mana;
+	int maxMana;
+
 	int coins;
 };
 

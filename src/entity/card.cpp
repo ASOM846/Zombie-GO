@@ -116,6 +116,9 @@ PlayerCard::PlayerCard() {
 
 	maxHp = 12;
 
+	maxMana = 10;
+	mana = maxMana;
+
 	hp = maxHp;
 	coins = 0;
 }

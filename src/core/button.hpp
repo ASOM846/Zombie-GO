@@ -7,7 +7,7 @@ struct Button {
 	const char *text;
 
 	float fontSize{20};
-	float fontSpacing{10};
+	float fontSpacing{4};
 
 	Button() = default;
 	Button(Rectangle rectangle, const char *p_text) {
@@ -39,8 +39,8 @@ struct Button {
 		Vector2 textSize =
 			MeasureTextEx(GetFontDefault(), text, fontSize, fontSpacing);
 
-		Vector2 finalPos = {{rect.x + rect.width - textSize.x / 2},
-							{rect.y + rect.height - textSize.y / 2}};
+		Vector2 finalPos = {{rect.x + rect.width / 2 - textSize.x / 2},
+							{rect.y + rect.height / 2 - textSize.y / 2}};
 
 		DrawTextEx(GetFontDefault(), text, finalPos, fontSize, fontSpacing,
 				   WHITE);

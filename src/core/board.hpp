@@ -20,6 +20,8 @@ class Board {
 
 	std::shared_ptr<PlayerCard> GetPlayer();
 
+	std::shared_ptr<Card> GetCellAtPosition(Vector2 posistion);
+
   private:
 	void RenderCell();
 

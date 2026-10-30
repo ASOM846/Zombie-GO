@@ -1,13 +1,25 @@
 #include "game.hpp"
-#include "../entity/card.hpp"
 #include <raylib.h>
 
 void Game::Init() {
 	board.Init();
+	spellPage.Init();
+
+	currentState = GameState::BOARD;
+
+	spellsButton.text = "SPELLS";
 }
 
 void Game::Update() {
 	board.Update();
+
+	int btnWidth = 100;
+	int btnHeight = 50;
+	spellsButton.rect = {
+		.x = static_cast<float>(GetScreenWidth() / 2 - btnWidth / 2),
+		.y = static_cast<float>(GetScreenHeight() - 40 - btnHeight),
+		.width = static_cast<float>(btnWidth),
+		.height = static_cast<float>(btnHeight)};
 
 	if (IsKeyPressed(KEY_DOWN)) {
 		board.HandleSwipeDown();
@@ -23,6 +35,36 @@ void Game::Update() {
 
 	if (IsKeyPressed(KEY_RIGHT)) {
 		board.HandleSwipeRight();
+	}
+
+	if (IsKeyPressed(KEY_M) || spellsButton.IsClicked(GetMousePosition())) {
+		currentState == GameState::SPELLS ? currentState = GameState::BOARD
+										  : currentState = GameState::SPELLS;
+	}
+
+	if (currentState == GameState::SPELLS) {
+		selectedSpell = spellPage.UpdateAndGetSelected();
+
+		if (selectedSpell != nullptr)
+			currentState = GameState::TARGETTING;
+	}
+
+	if (currentState == GameState::TARGETTING) {
+		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+			std::shared_ptr<Card> target =
+				board.GetCellAtPosition(GetMousePosition());
+
+			if (target == nullptr) {
+				currentState = GameState::BOARD;
+				selectedSpell = nullptr;
+			}
+
+			if (target != nullptr && selectedSpell != nullptr) {
+				selectedSpell->Interact(target);
+				currentState = GameState::BOARD;
+				selectedSpell = nullptr;
+			}
+		}
 	}
 
 	if (board.GetPlayer()->hp <= 0) {
@@ -51,4 +93,14 @@ void Game::Update() {
 
 void Game::Render() {
 	board.Render();
+
+	if (currentState == GameState::SPELLS)
+		spellPage.Render();
+
+	spellsButton.Draw(GetFontDefault());
+
+	if (selectedSpell)
+		DrawText(selectedSpell->name.c_str(), 100, 300, 30, GREEN);
+	else
+		DrawText("SPELL NOT SELECTED", 100, 300, 30, GREEN);
 }

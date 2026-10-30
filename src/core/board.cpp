@@ -182,6 +182,34 @@ Vector2 Board::GetPlayerPos() {
 	return playerPos;
 }
 
+std::shared_ptr<Card> Board::GetCellAtPosition(Vector2 posistion) {
+	Vector2 offset{
+		static_cast<float>(
+			(GetScreenWidth() - (cellWidth * boardX + spacing * (boardX - 1))) /
+			2),
+		static_cast<float>((GetScreenHeight() -
+							(cellHeight * boardY + spacing * (boardY - 1))) /
+						   2)};
+
+	for (int y = 0; y < boardY; y++) {
+		for (int x = 0; x < boardX; x++) {
+			Vector2 finalPos = {offset.x + ((cellWidth + spacing) * x),
+								offset.y + ((cellHeight + spacing) * y)};
+
+			Vector2 cellSize = {static_cast<float>(cellWidth),
+								static_cast<float>(cellHeight)};
+
+			Rectangle rect{finalPos.x, finalPos.y, cellSize.x, cellSize.y};
+
+			if (CheckCollisionPointRec(posistion, rect)) {
+				return board[y][x];
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 std::shared_ptr<Card> Board::GetRandomCard() {
 	int seed = GetRandomValue(0, 10);
 

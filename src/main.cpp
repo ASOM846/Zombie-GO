@@ -2,6 +2,7 @@
 
 #include "core/game.hpp"
 #include "core/menu.hpp"
+#include "core/ui.hpp"
 
 enum class WindowState {
 	GAME,
@@ -22,6 +23,8 @@ int main() {
 	Game game;
 	game.Init();
 
+	Ui ui;
+
 	WindowState currentState{WindowState::MENU};
 
 	while (!WindowShouldClose()) {
@@ -31,6 +34,8 @@ int main() {
 		switch (currentState) {
 		case WindowState::GAME:
 			game.Render();
+
+			ui.Render(game.GetBoard().GetPlayer());
 			game.Update();
 			break;
 		case WindowState::MENU:
