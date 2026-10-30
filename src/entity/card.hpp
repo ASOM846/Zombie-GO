@@ -1,9 +1,11 @@
 #pragma once
 
+#include <memory>
 #include <raylib.h>
 #include <string>
 
 class PlayerCard;
+class SwordCard;
 
 class Card {
   public:
@@ -35,8 +37,10 @@ class PlayerCard : public Card {
 
 	bool Interact(PlayerCard &player) override;
 
-	int attackPower;
+	std::shared_ptr<SwordCard> currentWeapon;
+
 	int maxHp;
+	int coins;
 };
 
 class EnemyCard : public Card {
@@ -79,4 +83,18 @@ class HealthPotionCard : public Card {
 	bool Interact(PlayerCard &player) override;
 
 	int amount;
+};
+
+class TrapCard : public Card {
+  public:
+	TrapCard();
+	~TrapCard() override = default;
+
+	void RenderContent(Vector2 offset, Vector2 cellSize) override;
+
+	[[nodiscard]] std::string GetValueText() const override;
+
+	bool Interact(PlayerCard &player) override;
+
+	int attack;
 };

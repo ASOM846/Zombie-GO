@@ -109,26 +109,34 @@ void Card::Render(Vector2 position, Vector2 cellSize) {
 
 PlayerCard::PlayerCard() {
 	name = "PLAYER";
-	attackPower = 5;
-	maxHp = 100;
+
+	currentWeapon = std::make_shared<SwordCard>();
+	currentWeapon->name = "SWORD";
+	currentWeapon->attack = 10;
+
+	maxHp = 12;
 
 	hp = maxHp;
+	coins = 0;
 }
 
 void PlayerCard::RenderContent(Vector2 offset, Vector2 cellSize) {
-	DrawRectangleLines(offset.x, offset.y, cellSize.x, cellSize.y, GOLD);
-	const char *value = std::to_string(hp).c_str();
+	// Rysujemy prostą ikonę gracza: sylwetkę hełmu/twarzy (koło + obrys)
+	float centerX = offset.x + cellSize.x / 2.0f;
+	float centerY = offset.y + cellSize.y / 2.0f;
 
-	DrawText(value, offset.x + 30, offset.y + 20, 30, GREEN);
+	// Miejsce na ikonę w środkowej części karty
+	DrawCircle(centerX, centerY - 10, 18, Color{100, 120, 150, 255});
+	DrawRectangle(centerX - 12, centerY + 8, 24, 20, Color{100, 120, 150, 255});
 
-	const char *attackValue = std::to_string(attackPower).c_str();
-
-	DrawText(attackValue, offset.x + 30, offset.y + 60, 30, RED);
+	// Mały napis informacyjny wewnątrz
+	DrawText("HERO", centerX - MeasureText("HERO", 10) / 2, centerY + 32, 10,
+			 DARKGRAY);
 }
 
 std::string PlayerCard::GetValueText() const {
 	return std::string{std::to_string(hp) + "  |  " +
-					   std::to_string(attackPower)};
+					   std::to_string(currentWeapon->attack)};
 }
 
 bool PlayerCard::Interact(PlayerCard &player) {}
@@ -150,9 +158,19 @@ EnemyCard::EnemyCard() {
 }
 
 void EnemyCard::RenderContent(Vector2 offset, Vector2 cellSize) {
-	const char *value = std::to_string(hp).c_str();
+	float centerX = offset.x + cellSize.x / 2.0f;
+	float centerY = offset.y + cellSize.y / 2.0f;
 
-	DrawText(value, offset.x + 30, offset.y + 20, 30, WHITE);
+	// Rysujemy stylizowaną "czaszkę" / mroczną sylwetkę wroga w losowym kolorze
+	// karty
+	DrawCircle(centerX, centerY - 5, 20, color);
+
+	// Oczy wroga (wycięcia)
+	DrawCircle(centerX - 7, centerY - 8, 4, RAYWHITE);
+	DrawCircle(centerX + 7, centerY - 8, 4, RAYWHITE);
+
+	// Usta/szczęka
+	DrawRectangle(centerX - 5, centerY + 5, 10, 6, RAYWHITE);
 }
 
 std::string EnemyCard::GetValueText() const {
@@ -162,14 +180,14 @@ std::string EnemyCard::GetValueText() const {
 bool EnemyCard::Interact(PlayerCard &player) {
 	int playerDmg = 0;
 
-	if (player.attackPower > 0) {
-		playerDmg = player.attackPower;
+	if (player.currentWeapon && player.currentWeapon->attack > 0) {
+		playerDmg = player.currentWeapon->attack;
 
-		player.attackPower -= hp;
+		player.currentWeapon->attack -= hp;
 		hp -= playerDmg;
 
-		if (player.attackPower < 0)
-			player.attackPower = 0;
+		if (player.currentWeapon->attack < 0)
+			player.currentWeapon->attack = 0;
 
 	} else {
 		playerDmg = player.hp;
@@ -196,11 +214,19 @@ SwordCard::SwordCard() {
 }
 
 void SwordCard::RenderContent(Vector2 offset, Vector2 cellSize) {
-	DrawRectangleLines(offset.x, offset.y, cellSize.x, cellSize.y, LIGHTGRAY);
+	float centerX = offset.x + cellSize.x / 2.0f;
+	float centerY = offset.y + cellSize.y / 2.0f;
 
-	const char *value = std::to_string(attack).c_str();
-
-	DrawText(value, offset.x + 30, offset.y + 20, 30, WHITE);
+	// Rysujemy prosty miecz skierowany w górę
+	// Ostrze
+	DrawRectangle(centerX - 3, centerY - 25, 6, 35, LIGHTGRAY);
+	DrawTriangle({centerX - 3, centerY - 25}, {centerX + 3, centerY - 25},
+				 {centerX, centerY - 35}, GRAY);
+	// Jelec (crossguard)
+	DrawRectangle(centerX - 12, centerY + 8, 24, 4, DARKGRAY);
+	// Rękojeść i głowica
+	DrawRectangle(centerX - 2, centerY + 12, 4, 12, BROWN);
+	DrawCircle(centerX, centerY + 26, 4, GOLD);
 }
 
 std::string SwordCard::GetValueText() const {
@@ -208,7 +234,7 @@ std::string SwordCard::GetValueText() const {
 }
 
 bool SwordCard::Interact(PlayerCard &player) {
-	player.attackPower = attack;
+	player.currentWeapon = std::make_shared<SwordCard>(*this);
 
 	return true;
 }
@@ -219,14 +245,20 @@ HealthPotionCard::HealthPotionCard() {
 }
 
 void HealthPotionCard::RenderContent(Vector2 offset, Vector2 cellSize) {
-	DrawRectangleLines(offset.x, offset.y, cellSize.x, cellSize.y, RED);
+	float centerX = offset.x + cellSize.x / 2.0f;
+	float centerY = offset.y + cellSize.y / 2.0f;
 
-	std::string title = "HP";
-	DrawText(title.c_str(), offset.x + 30, offset.y + 20, 20, WHITE);
+	// Rysujemy buteleczkę mikstury z płynem
+	// Szyjka butelki
+	DrawRectangle(centerX - 4, centerY - 22, 8, 8, DARKGRAY);
+	// Korek
+	DrawRectangle(centerX - 6, centerY - 26, 12, 4, BROWN);
+	// Korpus (bańka)
+	DrawCircle(centerX, centerY + 4, 16, Fade(RED, 0.4f));
+	DrawCircleLines(centerX, centerY + 4, 16, RED);
 
-	const char *value = std::to_string(amount).c_str();
-
-	DrawText(value, offset.x + 30, offset.y + 60, 30, WHITE);
+	// Biały refleks świetlny na miksturze
+	DrawCircle(centerX - 5, centerY, 3, Fade(WHITE, 0.6f));
 }
 
 std::string HealthPotionCard::GetValueText() const {
@@ -238,5 +270,21 @@ bool HealthPotionCard::Interact(PlayerCard &player) {
 
 	player.hp = std::min(player.hp, player.maxHp);
 
+	return true;
+}
+
+TrapCard::TrapCard() {
+	name = "TRAP";
+	attack = GetRandomValue(1, 8);
+}
+
+void TrapCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
+
+std::string TrapCard::GetValueText() const {
+	return std::to_string(attack);
+}
+
+bool TrapCard::Interact(PlayerCard &player) {
+	player.hp -= attack;
 	return true;
 }

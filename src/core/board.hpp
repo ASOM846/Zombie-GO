@@ -35,5 +35,5 @@ class Board {
 	int cellHeight = 266;
 	int cellWidth = 200;
 
-	const int spacing = 100;
+	const int spacing = 30;
 };

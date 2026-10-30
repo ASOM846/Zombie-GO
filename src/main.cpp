@@ -19,7 +19,7 @@ int main() {
 
 		game.Render();
 
-		ClearBackground(BLACK);
+		ClearBackground(DARKBLUE);
 
 		game.Update();
 

@@ -9,11 +9,11 @@ void Board::Init() {
 
 	for (int y = 0; y < boardY; y++) {
 		for (int x = 0; x < boardX; x++) {
-			board[y][x] = std::make_shared<EnemyCard>();
+			board[y][x] = GetRandomCard();
 		}
 	}
 
-	board[2][2] = std::make_shared<PlayerCard>();
+	board[1][1] = std::make_shared<PlayerCard>();
 }
 
 void Board::Update() {}
@@ -189,8 +189,12 @@ std::shared_ptr<Card> Board::GetRandomCard() {
 		return std::make_shared<SwordCard>();
 	}
 
-	if (seed >= 7) {
+	if (seed >= 8) {
 		return std::make_shared<HealthPotionCard>();
+	}
+
+	if (seed >= 7) {
+		return std::make_shared<TrapCard>();
 	}
 
 	return std::make_shared<EnemyCard>();
