@@ -11,7 +11,7 @@ class Spell {
 	Spell() = default;
 	virtual ~Spell() = default;
 
-	virtual void Render(Vector2 offset, Vector2 size);
+	virtual void Render(Vector2 position, Vector2 size);
 
   protected:
 	virtual void RenderContent(Vector2 offset, Vector2 size) = 0;
@@ -19,6 +19,8 @@ class Spell {
   public:
 	virtual void Interact(std::shared_ptr<Card> target) = 0;
 	std::string name;
+
+	int manaRequired;
 };
 
 class HealSpell : public Spell {

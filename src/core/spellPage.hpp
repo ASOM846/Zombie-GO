@@ -9,7 +9,7 @@ class SpellPage {
   public:
 	void Init();
 
-	std::shared_ptr<Spell> UpdateAndGetSelected();
+	std::shared_ptr<Spell> UpdateAndGetSelected(PlayerCard &player);
 	void Render();
 
 	int width{500};

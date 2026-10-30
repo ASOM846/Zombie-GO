@@ -8,7 +8,7 @@ void SpellPage::Init() {
 	UpdatePosition();
 }
 
-std::shared_ptr<Spell> SpellPage::UpdateAndGetSelected() {
+std::shared_ptr<Spell> SpellPage::UpdateAndGetSelected(PlayerCard &player) {
 	UpdatePosition();
 
 	Vector2 mousePos = GetMousePosition();
@@ -26,7 +26,9 @@ std::shared_ptr<Spell> SpellPage::UpdateAndGetSelected() {
 
 		if (CheckCollisionPointRec(mousePos, spellRect) &&
 			IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-			return spells[idx];
+			if (player.mana >= spells[idx]->manaRequired) {
+				return spells[idx];
+			}
 		}
 
 		idx++;

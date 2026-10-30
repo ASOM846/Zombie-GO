@@ -22,6 +22,8 @@ class Game {
 	Board &GetBoard() { return board; };
 
   private:
+	void RenderLose();
+
 	GameState currentState;
 
 	Board board;

@@ -21,35 +21,38 @@ void Game::Update() {
 		.width = static_cast<float>(btnWidth),
 		.height = static_cast<float>(btnHeight)};
 
-	if (IsKeyPressed(KEY_DOWN)) {
-		board.HandleSwipeDown();
-	}
-
-	if (IsKeyPressed(KEY_UP)) {
-		board.HandleSwipeUp();
-	}
-
-	if (IsKeyPressed(KEY_LEFT)) {
-		board.HandleSwipeLeft();
-	}
-
-	if (IsKeyPressed(KEY_RIGHT)) {
-		board.HandleSwipeRight();
-	}
-
 	if (IsKeyPressed(KEY_M) || spellsButton.IsClicked(GetMousePosition())) {
 		currentState == GameState::SPELLS ? currentState = GameState::BOARD
 										  : currentState = GameState::SPELLS;
 	}
 
-	if (currentState == GameState::SPELLS) {
-		selectedSpell = spellPage.UpdateAndGetSelected();
+	switch (currentState) {
+	case GameState::BOARD:
+		if (IsKeyPressed(KEY_DOWN)) {
+			board.HandleSwipeDown();
+		}
+
+		if (IsKeyPressed(KEY_UP)) {
+			board.HandleSwipeUp();
+		}
+
+		if (IsKeyPressed(KEY_LEFT)) {
+			board.HandleSwipeLeft();
+		}
+
+		if (IsKeyPressed(KEY_RIGHT)) {
+			board.HandleSwipeRight();
+		}
+
+		break;
+	case GameState::SPELLS:
+		selectedSpell = spellPage.UpdateAndGetSelected(*board.GetPlayer());
 
 		if (selectedSpell != nullptr)
 			currentState = GameState::TARGETTING;
-	}
 
-	if (currentState == GameState::TARGETTING) {
+		break;
+	case GameState::TARGETTING:
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 			std::shared_ptr<Card> target =
 				board.GetCellAtPosition(GetMousePosition());
@@ -61,33 +64,16 @@ void Game::Update() {
 
 			if (target != nullptr && selectedSpell != nullptr) {
 				selectedSpell->Interact(target);
+				board.GetPlayer()->mana -= selectedSpell->manaRequired;
 				currentState = GameState::BOARD;
 				selectedSpell = nullptr;
 			}
 		}
+		break;
 	}
 
 	if (board.GetPlayer()->hp <= 0) {
-		float rectangleHeight{100};
-		Vector2 recPos{0, {(GetScreenHeight() - rectangleHeight) / 2}};
-
-		DrawRectangleV(recPos,
-					   {static_cast<float>(GetScreenWidth()), rectangleHeight},
-					   ColorAlpha(BLACK, 0.5));
-
-		std::string text{"GAME LOST"};
-
-		int fontSize = 60;
-		int spacing = 4;
-
-		Vector2 textSize =
-			MeasureTextEx(GetFontDefault(), text.c_str(), fontSize, spacing);
-
-		Vector2 finalPos{{(GetScreenWidth() - textSize.x) / 2},
-						 {(GetScreenHeight() - textSize.y) / 2}};
-
-		DrawTextEx(GetFontDefault(), text.c_str(), finalPos, fontSize, spacing,
-				   RED);
+		RenderLose();
 	}
 }
 
@@ -103,4 +89,27 @@ void Game::Render() {
 		DrawText(selectedSpell->name.c_str(), 100, 300, 30, GREEN);
 	else
 		DrawText("SPELL NOT SELECTED", 100, 300, 30, GREEN);
+}
+
+void Game::RenderLose() {
+	float rectangleHeight{100};
+	Vector2 recPos{0, {(GetScreenHeight() - rectangleHeight) / 2}};
+
+	DrawRectangleV(recPos,
+				   {static_cast<float>(GetScreenWidth()), rectangleHeight},
+				   ColorAlpha(BLACK, 0.5));
+
+	std::string text{"GAME LOST"};
+
+	int fontSize = 60;
+	int spacing = 4;
+
+	Vector2 textSize =
+		MeasureTextEx(GetFontDefault(), text.c_str(), fontSize, spacing);
+
+	Vector2 finalPos{{(GetScreenWidth() - textSize.x) / 2},
+					 {(GetScreenHeight() - textSize.y) / 2}};
+
+	DrawTextEx(GetFontDefault(), text.c_str(), finalPos, fontSize, spacing,
+			   RED);
 }

@@ -13,10 +13,18 @@ class Ui {
 		DrawRectangle(100, 100, 300, 50, GREEN);
 		DrawRectangle(100, 100, 300 * hpPercent, 50, RED);
 
+		hpPercent *= 100;
+		DrawText(std::to_string(static_cast<int>(hpPercent)).c_str(), 100, 100,
+				 30, MAGENTA);
+
 		float manaPercent = static_cast<float>(player->mana) /
 							static_cast<float>(player->maxMana);
 
 		DrawRectangle(100, 200, 300, 50, DARKGRAY);
 		DrawRectangle(100, 200, 300 * manaPercent, 50, ORANGE);
+
+		manaPercent *= 100;
+		DrawText(std::to_string(static_cast<int>(player->mana)).c_str(), 100,
+				 200, 30, MAGENTA);
 	}
 };

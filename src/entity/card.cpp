@@ -138,8 +138,8 @@ void PlayerCard::RenderContent(Vector2 offset, Vector2 cellSize) {
 }
 
 std::string PlayerCard::GetValueText() const {
-	return std::string{std::to_string(hp) + "  |  " +
-					   std::to_string(currentWeapon->attack)};
+	return std::string{std::to_string(hp) + "/" + std::to_string(maxHp) +
+					   "  |  " + std::to_string(currentWeapon->attack)};
 }
 
 bool PlayerCard::Interact(PlayerCard &player) {}
