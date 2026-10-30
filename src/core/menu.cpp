@@ -2,14 +2,15 @@
 #include <raylib.h>
 
 void Menu::Init() {
-	startGameButton.rect = {.x = 200, .y = 200, .width = 100, .height = 100};
-
 	startGameButton.text = "startGame";
 
 	shouldGameStart = false;
+
+	InitButtonsPositions();
 }
 
 void Menu::Update() {
+	InitButtonsPositions();
 	shouldGameStart = false;
 
 	if (startGameButton.IsClicked(GetMousePosition())) {
@@ -21,6 +22,19 @@ void Menu::Render() {
 	startGameButton.Draw(GetFontDefault());
 }
 
-bool Menu::ShouldGameStart() {
+bool Menu::ShouldGameStart() const {
 	return shouldGameStart;
+}
+
+void Menu::InitButtonsPositions() {
+	Vector2 startButtonSize = {150, 50};
+	Vector2 startButtonPos = {
+		GetScreenWidth() / 2 - startButtonSize.x / 2,
+		GetScreenHeight() / 2 - startButtonSize.y / 2,
+	};
+
+	startGameButton.rect = {.x = startButtonPos.x,
+							.y = startButtonPos.y,
+							.width = startButtonSize.x,
+							.height = startButtonSize.y};
 }

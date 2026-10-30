@@ -8,7 +8,10 @@ class Menu {
 	void Update();
 	void Render();
 
-	bool ShouldGameStart();
+	[[nodiscard]] bool ShouldGameStart() const;
+
+  private:
+	void InitButtonsPositions();
 
 	Button startGameButton;
 

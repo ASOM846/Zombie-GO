@@ -1,4 +1,5 @@
 #include "spell.hpp"
+#include <memory>
 #include <raylib.h>
 
 void Spell::Render(Vector2 position, Vector2 size) {
@@ -115,8 +116,19 @@ void HealSpell::RenderContent(Vector2 offset, Vector2 size) {
 	DrawText("HEAL  5", offset.x + 10, offset.y + 10, 20, RED);
 }
 
-void HealSpell::Interact(std::shared_ptr<Card> target) {
-	target->hp += healAmount;
+bool HealSpell::Interact(std::shared_ptr<Card> target) {
+
+	if (auto playerTarget = std::dynamic_pointer_cast<PlayerCard>(target)) {
+		playerTarget->hp += healAmount;
+		return true;
+	}
+
+	if (auto enemyTarget = std::dynamic_pointer_cast<EnemyCard>(target)) {
+		enemyTarget->hp += healAmount;
+		return true;
+	}
+
+	return false;
 }
 
 DamageSpell::DamageSpell() {
@@ -130,6 +142,16 @@ void DamageSpell::RenderContent(Vector2 offset, Vector2 size) {
 	DrawText("DAMAGE  5", offset.x + 10, offset.y + 10, 20, RED);
 }
 
-void DamageSpell::Interact(std::shared_ptr<Card> target) {
-	target->hp -= damageAmount;
+bool DamageSpell::Interact(std::shared_ptr<Card> target) {
+	if (auto playerTarget = std::dynamic_pointer_cast<PlayerCard>(target)) {
+		playerTarget->hp -= damageAmount;
+		return true;
+	}
+
+	if (auto enemyTarget = std::dynamic_pointer_cast<EnemyCard>(target)) {
+		enemyTarget->hp -= damageAmount;
+		return true;
+	}
+
+	return false;
 }

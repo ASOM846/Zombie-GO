@@ -63,8 +63,9 @@ void Game::Update() {
 			}
 
 			if (target != nullptr && selectedSpell != nullptr) {
-				selectedSpell->Interact(target);
-				board.GetPlayer()->mana -= selectedSpell->manaRequired;
+				if (selectedSpell->Interact(target)) {
+					board.GetPlayer()->mana -= selectedSpell->manaRequired;
+				}
 				currentState = GameState::BOARD;
 				selectedSpell = nullptr;
 			}
