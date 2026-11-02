@@ -1,10 +1,12 @@
 #pragma once
 
 #include "../core/textureManager.hpp"
+#include "spell/spell.hpp"
 
 #include <memory>
 #include <raylib.h>
 #include <string>
+#include <vector>
 
 class PlayerCard;
 class SwordCard;
@@ -58,10 +60,9 @@ class PlayerCard : public Card {
 
 	std::shared_ptr<SwordCard> currentWeapon;
 
-	int maxHp;
+	std::vector<std::shared_ptr<Spell>> spells;
 
-	int mana;
-	int maxMana;
+	int maxHp;
 
 	int coins;
 };
@@ -100,21 +101,6 @@ class HealthPotionCard : public Card {
   public:
 	HealthPotionCard();
 	~HealthPotionCard() override = default;
-
-	void RenderContent(Vector2 position, Vector2 cellSize,
-					   TextureManager &tm) override;
-
-	[[nodiscard]] std::string GetValueText() const override;
-
-	bool Interact(PlayerCard &player) override;
-
-	int amount;
-};
-
-class ManaPotionCard : public Card {
-  public:
-	ManaPotionCard();
-	~ManaPotionCard() override = default;
 
 	void RenderContent(Vector2 position, Vector2 cellSize,
 					   TextureManager &tm) override;
@@ -167,4 +153,19 @@ class ChestCard : public Card {
 	[[nodiscard]] std::string GetValueText() const override;
 
 	bool Interact(PlayerCard &player) override;
+};
+
+class SpellRecepieCard : public Card {
+  public:
+	SpellRecepieCard();
+	~SpellRecepieCard() override = default;
+
+	void RenderContent(Vector2 position, Vector2 cellSize,
+					   TextureManager &tm) override;
+
+	[[nodiscard]] std::string GetValueText() const override;
+
+	bool Interact(PlayerCard &player) override;
+
+	std::shared_ptr<Spell> spell;
 };

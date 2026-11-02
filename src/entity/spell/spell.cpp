@@ -2,6 +2,8 @@
 #include <memory>
 #include <raylib.h>
 
+#include "../card.hpp"
+
 void Spell::Render(Vector2 position, Vector2 size) {
 	float centerX = position.x + size.x / 2.0f;
 	float centerY = position.y + size.y / 2.0f;

@@ -1,4 +1,6 @@
 #include "game.hpp"
+#include <algorithm>
+#include <memory>
 #include <raylib.h>
 
 void Game::Init() {
@@ -27,9 +29,14 @@ void Game::Update() {
 		.width = static_cast<float>(btnWidth),
 		.height = static_cast<float>(btnHeight)};
 
-	if (IsKeyPressed(KEY_M) || spellsButton.IsClicked(GetMousePosition())) {
+	if (spellsButton.IsClicked(GetMousePosition())) {
 		currentState == GameState::SPELLS ? currentState = GameState::BOARD
 										  : currentState = GameState::SPELLS;
+	}
+
+	if (IsKeyPressed(KEY_M)) {
+		board.GetPlayer()->spells.push_back(std::make_shared<HealSpell>());
+		board.GetPlayer()->spells.push_back(std::make_shared<DamageSpell>());
 	}
 
 	switch (currentState) {
@@ -91,8 +98,16 @@ void Game::Update() {
 
 			if (target != nullptr && selectedSpell != nullptr) {
 				if (selectedSpell->Interact(target)) {
-					board.GetPlayer()->mana -= selectedSpell->manaRequired;
+					auto &spells = board.GetPlayer()->spells;
+
+					auto it =
+						std::find(spells.begin(), spells.end(), selectedSpell);
+
+					if (it != spells.end()) {
+						spells.erase(it);
+					}
 				}
+
 				currentState = GameState::BOARD;
 				selectedSpell = nullptr;
 			}
@@ -109,7 +124,7 @@ void Game::Render() {
 	board.Render(textureManager);
 
 	if (currentState == GameState::SPELLS)
-		spellPage.Render();
+		spellPage.Render(*board.GetPlayer());
 
 	spellsButton.Draw(GetFontDefault());
 

@@ -2,9 +2,9 @@
 #include <raylib.h>
 
 void SpellPage::Init() {
-	spells.push_back(std::make_shared<HealSpell>());
-	spells.push_back(std::make_shared<DamageSpell>());
-
+	// spells.push_back(std::make_shared<HealSpell>());
+	// spells.push_back(std::make_shared<DamageSpell>());
+	//
 	UpdatePosition();
 }
 
@@ -18,7 +18,7 @@ std::shared_ptr<Spell> SpellPage::UpdateAndGetSelected(PlayerCard &player) {
 	Vector2 size{static_cast<float>(width), 150};
 
 	int idx = 0;
-	for (auto &spell : spells) {
+	for (auto &spell : player.spells) {
 
 		Vector2 finalPos{offset.x, offset.y + idx * size.y};
 
@@ -26,9 +26,7 @@ std::shared_ptr<Spell> SpellPage::UpdateAndGetSelected(PlayerCard &player) {
 
 		if (CheckCollisionPointRec(mousePos, spellRect) &&
 			IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-			if (player.mana >= spells[idx]->manaRequired) {
-				return spells[idx];
-			}
+			return player.spells[idx];
 		}
 
 		idx++;
@@ -37,7 +35,7 @@ std::shared_ptr<Spell> SpellPage::UpdateAndGetSelected(PlayerCard &player) {
 	return nullptr;
 }
 
-void SpellPage::Render() {
+void SpellPage::Render(PlayerCard &player) {
 	DrawRectangleRec(rect, DARKBROWN);
 
 	Vector2 offset{rect.x, rect.y};
@@ -45,7 +43,7 @@ void SpellPage::Render() {
 	Vector2 size{static_cast<float>(width), 150};
 
 	int idx = 0;
-	for (auto &spell : spells) {
+	for (auto &spell : player.spells) {
 
 		Vector2 finalPos{offset.x, offset.y + idx * size.y};
 

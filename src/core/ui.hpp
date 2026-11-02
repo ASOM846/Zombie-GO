@@ -6,7 +6,7 @@
 class Ui {
   public:
 	void Update();
-	void Render(std::shared_ptr<PlayerCard> player) {
+	void Render(const std::shared_ptr<PlayerCard> &player) {
 		float hpPercent =
 			static_cast<float>(player->hp) / static_cast<float>(player->maxHp);
 
@@ -16,15 +16,5 @@ class Ui {
 		hpPercent *= 100;
 		DrawText(std::to_string(static_cast<int>(hpPercent)).c_str(), 100, 100,
 				 30, MAGENTA);
-
-		float manaPercent = static_cast<float>(player->mana) /
-							static_cast<float>(player->maxMana);
-
-		DrawRectangle(100, 200, 300, 50, DARKGRAY);
-		DrawRectangle(100, 200, 300 * manaPercent, 50, ORANGE);
-
-		manaPercent *= 100;
-		DrawText(std::to_string(static_cast<int>(player->mana)).c_str(), 100,
-				 200, 30, MAGENTA);
 	}
 };

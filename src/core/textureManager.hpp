@@ -12,11 +12,19 @@ enum class TextureId {
 
 	CHEST_0,
 
+	CRATE_0,
+
 	FLASK_0,
 	FLASK_1,
 	FLASK_2,
 
 	WEAPON_0,
+	WEAPON_1,
+	WEAPON_2,
+	WEAPON_3,
+	WEAPON_4,
+	WEAPON_5,
+	WEAPON_6,
 
 	ENEMY_0,
 	ENEMY_1,
@@ -45,11 +53,20 @@ class TextureManager {
 		load(TextureId::TRAP_0, "assets/trap0.png");
 
 		load(TextureId::CHEST_0, "assets/chest0.png");
+
+		load(TextureId::CRATE_0, "assets/crate0.png");
+
 		load(TextureId::FLASK_0, "assets/flask0.png");
 		load(TextureId::FLASK_1, "assets/flask1.png");
 		load(TextureId::FLASK_2, "assets/flask2.png");
 
 		load(TextureId::WEAPON_0, "assets/weapon0.png");
+		load(TextureId::WEAPON_1, "assets/weapon1.png");
+		load(TextureId::WEAPON_2, "assets/weapon2.png");
+		load(TextureId::WEAPON_3, "assets/weapon3.png");
+		load(TextureId::WEAPON_4, "assets/weapon4.png");
+		load(TextureId::WEAPON_5, "assets/weapon5.png");
+		load(TextureId::WEAPON_6, "assets/weapon6.png");
 
 		load(TextureId::ENEMY_0, "assets/enemy0.png");
 		load(TextureId::ENEMY_1, "assets/enemy1.png");

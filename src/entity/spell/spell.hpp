@@ -4,7 +4,7 @@
 #include <raylib.h>
 #include <string>
 
-#include "../card.hpp"
+class Card;
 
 class Spell {
   public:

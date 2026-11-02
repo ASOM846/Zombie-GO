@@ -3,6 +3,7 @@
 #include <raylib.h>
 #include <vector>
 
+#include "../entity/card.hpp"
 #include "../entity/spell/spell.hpp"
 
 class SpellPage {
@@ -10,14 +11,12 @@ class SpellPage {
 	void Init();
 
 	std::shared_ptr<Spell> UpdateAndGetSelected(PlayerCard &player);
-	void Render();
+	void Render(PlayerCard &player);
 
 	int width{500};
 	int height{700};
 
 	Rectangle rect;
-
-	std::vector<std::shared_ptr<Spell>> spells;
 
   private:
 	void UpdatePosition();

@@ -1,7 +1,10 @@
 #include "card.hpp"
+#include "spell/spell.hpp"
 #include <algorithm>
 #include <cmath>
+#include <functional>
 #include <iostream>
+#include <memory>
 #include <raylib.h>
 #include <string>
 #include <vector>
@@ -195,9 +198,6 @@ PlayerCard::PlayerCard() {
 
 	maxHp = 12;
 
-	maxMana = 10;
-	mana = maxMana;
-
 	hp = maxHp;
 	coins = 0;
 
@@ -286,9 +286,31 @@ bool EnemyCard::Interact(PlayerCard &player) {
 }
 
 SwordCard::SwordCard() {
-	name = "WEAPON";
-	attack = GetRandomValue(3, 10);
-	textureId = TextureId::WEAPON_0;
+	struct WeaponParms {
+		std::string name;
+		TextureId texture;
+	};
+
+	auto GetRandomParms = [this]() {
+		std::vector<WeaponParms> parms{{"SWORD", TextureId::WEAPON_0},
+									   {"AXE", TextureId::WEAPON_1},
+									   {"BATON", TextureId::WEAPON_2},
+									   {"DOUBLE AXE", TextureId::WEAPON_3},
+									   {"HAMMER", TextureId::WEAPON_4},
+									   {"KNIFE", TextureId::WEAPON_5},
+									   {"SAW SWORD", TextureId::WEAPON_6}};
+
+		int seed = GetRandomValue(0, parms.size() - 1);
+
+		return parms[seed];
+	};
+
+	WeaponParms parms = GetRandomParms();
+
+	name = parms.name;
+	textureId = parms.texture;
+
+	attack = GetRandomValue(3, 8);
 }
 
 void SwordCard::RenderContent(Vector2 offset, Vector2 cellSize,
@@ -321,27 +343,6 @@ bool HealthPotionCard::Interact(PlayerCard &player) {
 	player.hp += amount;
 
 	player.hp = std::min(player.hp, player.maxHp);
-
-	return true;
-}
-
-ManaPotionCard::ManaPotionCard() {
-	name = "MANA POTION";
-	amount = GetRandomValue(3, 12);
-	textureId = TextureId::FLASK_1;
-}
-
-void ManaPotionCard::RenderContent(Vector2 offset, Vector2 cellSize,
-								   TextureManager &tm) {}
-
-std::string ManaPotionCard::GetValueText() const {
-	return std::to_string(amount);
-}
-
-bool ManaPotionCard::Interact(PlayerCard &player) {
-	player.mana += amount;
-
-	player.mana = std::min(player.mana, player.maxMana);
 
 	return true;
 }
@@ -396,4 +397,46 @@ std::string ChestCard::GetValueText() const {
 
 bool ChestCard::Interact(PlayerCard &player) {
 	return false;
+}
+
+SpellRecepieCard::SpellRecepieCard() {
+	name = "SPELL";
+
+	auto GetRandomSpell = []() {
+		std::vector<std::pair<int, std::function<std::shared_ptr<Spell>()>>>
+			weightedPool = {
+				{60, []() { return std::make_shared<HealSpell>(); }},
+				{10, []() { return std::make_shared<DamageSpell>(); }}};
+
+		int totalWeight = 0;
+		for (const auto &entry : weightedPool) {
+			totalWeight += entry.first;
+		}
+
+		int roll = GetRandomValue(0, totalWeight - 1);
+
+		int currentSum = 0;
+		for (const auto &entry : weightedPool) {
+			currentSum += entry.first;
+			if (roll < currentSum) {
+				return entry.second();
+			}
+		}
+	};
+
+	spell = GetRandomSpell();
+
+	textureId = TextureId::CRATE_0;
+}
+
+void SpellRecepieCard::RenderContent(Vector2 offset, Vector2 cellSize,
+									 TextureManager &tm) {}
+
+std::string SpellRecepieCard::GetValueText() const {
+	return spell->name;
+}
+
+bool SpellRecepieCard::Interact(PlayerCard &player) {
+	player.spells.push_back(spell);
+	return true;
 }

@@ -261,7 +261,7 @@ std::shared_ptr<Card> Board::GetRandomCard() {
 			{60, []() { return std::make_shared<EnemyCard>(); }},
 			{15, []() { return std::make_shared<TrapCard>(); }},
 			{10, []() { return std::make_shared<HealthPotionCard>(); }},
-			{10, []() { return std::make_shared<ManaPotionCard>(); }},
+			{10, []() { return std::make_shared<SpellRecepieCard>(); }},
 			{10, []() { return std::make_shared<ChestCard>(); }},
 			{10, []() { return std::make_shared<SwordCard>(); }}};
 
