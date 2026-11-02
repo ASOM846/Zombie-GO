@@ -1,5 +1,6 @@
 #include "board.hpp"
 #include "cmath"
+#include <functional>
 #include <memory>
 #include <raylib.h>
 #include <string>
@@ -211,18 +212,27 @@ std::shared_ptr<Card> Board::GetCellAtPosition(Vector2 posistion) {
 }
 
 std::shared_ptr<Card> Board::GetRandomCard() {
-	int seed = GetRandomValue(0, 10);
+	std::vector<std::pair<int, std::function<std::shared_ptr<Card>()>>>
+		weightedPool = {
+			{60, []() { return std::make_shared<EnemyCard>(); }},
+			{15, []() { return std::make_shared<TrapCard>(); }},
+			{10, []() { return std::make_shared<HealthPotionCard>(); }},
+			{10, []() { return std::make_shared<ManaPotionCard>(); }},
+			{10, []() { return std::make_shared<SwordCard>(); }}};
 
-	if (seed >= 9) {
-		return std::make_shared<SwordCard>();
+	int totalWeight = 0;
+	for (const auto &entry : weightedPool) {
+		totalWeight += entry.first;
 	}
 
-	if (seed >= 8) {
-		return std::make_shared<HealthPotionCard>();
-	}
+	int roll = GetRandomValue(0, totalWeight - 1);
 
-	if (seed >= 7) {
-		return std::make_shared<TrapCard>();
+	int currentSum = 0;
+	for (const auto &entry : weightedPool) {
+		currentSum += entry.first;
+		if (roll < currentSum) {
+			return entry.second();
+		}
 	}
 
 	return std::make_shared<EnemyCard>();

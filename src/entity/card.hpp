@@ -89,6 +89,20 @@ class HealthPotionCard : public Card {
 	int amount;
 };
 
+class ManaPotionCard : public Card {
+  public:
+	ManaPotionCard();
+	~ManaPotionCard() override = default;
+
+	void RenderContent(Vector2 offset, Vector2 cellSize) override;
+
+	[[nodiscard]] std::string GetValueText() const override;
+
+	bool Interact(PlayerCard &player) override;
+
+	int amount;
+};
+
 class TrapCard : public Card {
   public:
 	TrapCard();

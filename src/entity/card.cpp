@@ -276,6 +276,40 @@ bool HealthPotionCard::Interact(PlayerCard &player) {
 	return true;
 }
 
+ManaPotionCard::ManaPotionCard() {
+	name = "MANA POTION";
+	amount = GetRandomValue(3, 12);
+}
+
+void ManaPotionCard::RenderContent(Vector2 offset, Vector2 cellSize) {
+	float centerX = offset.x + cellSize.x / 2.0f;
+	float centerY = offset.y + cellSize.y / 2.0f;
+
+	// Rysujemy buteleczkę mikstury z płynem
+	// Szyjka butelki
+	DrawRectangle(centerX - 4, centerY - 22, 8, 8, DARKGRAY);
+	// Korek
+	DrawRectangle(centerX - 6, centerY - 26, 12, 4, BROWN);
+	// Korpus (bańka)
+	DrawCircle(centerX, centerY + 4, 16, Fade(BLUE, 0.4f));
+	DrawCircleLines(centerX, centerY + 4, 16, BLUE);
+
+	// Biały refleks świetlny na miksturze
+	DrawCircle(centerX - 5, centerY, 3, Fade(WHITE, 0.6f));
+}
+
+std::string ManaPotionCard::GetValueText() const {
+	return std::to_string(amount);
+}
+
+bool ManaPotionCard::Interact(PlayerCard &player) {
+	player.mana += amount;
+
+	player.mana = std::min(player.mana, player.maxMana);
+
+	return true;
+}
+
 TrapCard::TrapCard() {
 	name = "TRAP";
 	attack = GetRandomValue(1, 8);
