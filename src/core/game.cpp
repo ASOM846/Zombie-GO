@@ -2,6 +2,8 @@
 #include <raylib.h>
 
 void Game::Init() {
+	textureManager.loadAll();
+
 	board.Init();
 	spellPage.Init();
 
@@ -11,6 +13,10 @@ void Game::Init() {
 }
 
 void Game::Update() {
+	lastGesture = currentGesture;
+	currentGesture = GetGestureDetected();
+	touchPosition = GetTouchPosition(0);
+
 	board.Update();
 
 	int btnWidth = 100;
@@ -28,6 +34,7 @@ void Game::Update() {
 
 	switch (currentState) {
 	case GameState::BOARD:
+
 		if (IsKeyPressed(KEY_DOWN)) {
 			board.HandleSwipeDown();
 		}
@@ -42,6 +49,26 @@ void Game::Update() {
 
 		if (IsKeyPressed(KEY_RIGHT)) {
 			board.HandleSwipeRight();
+		}
+
+		if (CheckCollisionPointRec(touchPosition, touchArea) &&
+			(currentGesture != GESTURE_NONE)) {
+			if (currentGesture != lastGesture) {
+				switch (currentGesture) {
+				case GESTURE_SWIPE_DOWN:
+					board.HandleSwipeDown();
+					break;
+				case GESTURE_SWIPE_UP:
+					board.HandleSwipeUp();
+					break;
+				case GESTURE_SWIPE_LEFT:
+					board.HandleSwipeLeft();
+					break;
+				case GESTURE_SWIPE_RIGHT:
+					board.HandleSwipeRight();
+					break;
+				}
+			}
 		}
 
 		break;
@@ -79,7 +106,7 @@ void Game::Update() {
 }
 
 void Game::Render() {
-	board.Render();
+	board.Render(textureManager);
 
 	if (currentState == GameState::SPELLS)
 		spellPage.Render();

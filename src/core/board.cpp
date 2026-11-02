@@ -1,9 +1,8 @@
 #include "board.hpp"
-#include "cmath"
+#include "textureManager.hpp"
 #include <functional>
 #include <memory>
 #include <raylib.h>
-#include <string>
 
 void Board::Init() {
 	board.resize(boardY, std::vector<std::shared_ptr<Card>>(boardX));
@@ -19,7 +18,7 @@ void Board::Init() {
 
 void Board::Update() {}
 
-void Board::Render() {
+void Board::Render(TextureManager &tm) {
 	Vector2 offset{
 		static_cast<float>(
 			(GetScreenWidth() - (cellWidth * boardX + spacing * (boardX - 1))) /
@@ -36,7 +35,7 @@ void Board::Render() {
 			Vector2 cellSize = {static_cast<float>(cellWidth),
 								static_cast<float>(cellHeight)};
 
-			board[y][x]->Render(finalPos, cellSize);
+			board[y][x]->Render(finalPos, cellSize, tm);
 		}
 	}
 }
@@ -54,6 +53,11 @@ void Board::HandleSwipeDown() {
 		std::dynamic_pointer_cast<PlayerCard>(board[playerPos.y][playerPos.x]);
 
 	auto target = board[targetY][playerPos.x];
+
+	if (std::dynamic_pointer_cast<ChestCard>(target) != nullptr) {
+		board[targetY][playerPos.x] = std::make_shared<CoinCard>();
+		return;
+	}
 
 	if (target != nullptr) {
 		if (!target->Interact(*player)) {
@@ -84,6 +88,11 @@ void Board::HandleSwipeUp() {
 
 	auto target = board[targetY][playerPos.x];
 
+	if (std::dynamic_pointer_cast<ChestCard>(target) != nullptr) {
+		board[targetY][playerPos.x] = std::make_shared<CoinCard>();
+		return;
+	}
+
 	if (target != nullptr) {
 		if (!target->Interact(*player)) {
 			return;
@@ -112,6 +121,11 @@ void Board::HandleSwipeLeft() {
 		std::dynamic_pointer_cast<PlayerCard>(board[playerPos.y][playerPos.x]);
 
 	auto target = board[playerPos.y][targetX];
+
+	if (std::dynamic_pointer_cast<ChestCard>(target) != nullptr) {
+		board[playerPos.y][targetX] = std::make_shared<CoinCard>();
+		return;
+	}
 
 	auto enemy = std::dynamic_pointer_cast<EnemyCard>(target);
 
@@ -143,6 +157,11 @@ void Board::HandleSwipeRight() {
 		std::dynamic_pointer_cast<PlayerCard>(board[playerPos.y][playerPos.x]);
 
 	auto target = board[playerPos.y][targetX];
+
+	if (std::dynamic_pointer_cast<ChestCard>(target) != nullptr) {
+		board[playerPos.y][targetX] = std::make_shared<CoinCard>();
+		return;
+	}
 
 	if (target != nullptr) {
 		if (!target->Interact(*player)) {
@@ -218,6 +237,7 @@ std::shared_ptr<Card> Board::GetRandomCard() {
 			{15, []() { return std::make_shared<TrapCard>(); }},
 			{10, []() { return std::make_shared<HealthPotionCard>(); }},
 			{10, []() { return std::make_shared<ManaPotionCard>(); }},
+			{10, []() { return std::make_shared<ChestCard>(); }},
 			{10, []() { return std::make_shared<SwordCard>(); }}};
 
 	int totalWeight = 0;

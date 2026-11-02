@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-void Card::Render(Vector2 position, Vector2 cellSize) {
+void Card::Render(Vector2 position, Vector2 cellSize, TextureManager &tm) {
 	float centerX = position.x + cellSize.x / 2.0f;
 	float centerY = position.y + cellSize.y / 2.0f;
 
@@ -102,6 +102,15 @@ void Card::Render(Vector2 position, Vector2 cellSize) {
 	// if (topCard->type == CardType::POTION)
 	// 	valueColor = Color{25, 110, 25, 255};
 
+	const Texture2D &texture = tm.get(textureId);
+
+	float scale = 3.0F;
+
+	float drawX = centerX - (texture.width * scale) / 2.0f;
+	float drawY = centerY - (texture.height * scale) / 2.0f;
+
+	DrawTextureEx(texture, {drawX, drawY - 5 * scale}, 0.0f, scale, RAYWHITE);
+
 	DrawText(valueStr, valTextX, valTextY, fontSize, valueColor);
 
 	RenderContent(position, cellSize);
@@ -121,21 +130,11 @@ PlayerCard::PlayerCard() {
 
 	hp = maxHp;
 	coins = 0;
+
+	textureId = TextureId::KNIGHT;
 }
 
-void PlayerCard::RenderContent(Vector2 offset, Vector2 cellSize) {
-	// Rysujemy prostą ikonę gracza: sylwetkę hełmu/twarzy (koło + obrys)
-	float centerX = offset.x + cellSize.x / 2.0f;
-	float centerY = offset.y + cellSize.y / 2.0f;
-
-	// Miejsce na ikonę w środkowej części karty
-	DrawCircle(centerX, centerY - 10, 18, Color{100, 120, 150, 255});
-	DrawRectangle(centerX - 12, centerY + 8, 24, 20, Color{100, 120, 150, 255});
-
-	// Mały napis informacyjny wewnątrz
-	DrawText("HERO", centerX - MeasureText("HERO", 10) / 2, centerY + 32, 10,
-			 DARKGRAY);
-}
+void PlayerCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
 
 std::string PlayerCard::GetValueText() const {
 	return std::string{std::to_string(hp) + "/" + std::to_string(maxHp) +
@@ -148,33 +147,20 @@ EnemyCard::EnemyCard() {
 	hp = GetRandomValue(1, 6);
 	name = "ENEMY";
 
-	auto GetRandomColor = []() {
-		std::vector<Color> colors{RED,	  GREEN,  BLUE,	 MAGENTA,
-								  PURPLE, YELLOW, ORANGE};
+	auto GetRandomTexture = []() {
+		std::vector<TextureId> textures{TextureId::ENEMY_0, TextureId::ENEMY_1,
+										TextureId::ENEMY_2, TextureId::ENEMY_3,
+										TextureId::ENEMY_4, TextureId::ENEMY_5};
 
-		int seed = GetRandomValue(0, colors.size() - 1);
+		int seed = GetRandomValue(0, textures.size() - 1);
 
-		return colors[seed];
+		return textures[seed];
 	};
 
-	color = GetRandomColor();
+	textureId = GetRandomTexture();
 }
 
-void EnemyCard::RenderContent(Vector2 offset, Vector2 cellSize) {
-	float centerX = offset.x + cellSize.x / 2.0f;
-	float centerY = offset.y + cellSize.y / 2.0f;
-
-	// Rysujemy stylizowaną "czaszkę" / mroczną sylwetkę wroga w losowym kolorze
-	// karty
-	DrawCircle(centerX, centerY - 5, 20, color);
-
-	// Oczy wroga (wycięcia)
-	DrawCircle(centerX - 7, centerY - 8, 4, RAYWHITE);
-	DrawCircle(centerX + 7, centerY - 8, 4, RAYWHITE);
-
-	// Usta/szczęka
-	DrawRectangle(centerX - 5, centerY + 5, 10, 6, RAYWHITE);
-}
+void EnemyCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
 
 std::string EnemyCard::GetValueText() const {
 	return std::to_string(hp);
@@ -214,23 +200,10 @@ bool EnemyCard::Interact(PlayerCard &player) {
 SwordCard::SwordCard() {
 	name = "WEAPON";
 	attack = GetRandomValue(3, 10);
+	textureId = TextureId::WEAPON_0;
 }
 
-void SwordCard::RenderContent(Vector2 offset, Vector2 cellSize) {
-	float centerX = offset.x + cellSize.x / 2.0f;
-	float centerY = offset.y + cellSize.y / 2.0f;
-
-	// Rysujemy prosty miecz skierowany w górę
-	// Ostrze
-	DrawRectangle(centerX - 3, centerY - 25, 6, 35, LIGHTGRAY);
-	DrawTriangle({centerX - 3, centerY - 25}, {centerX + 3, centerY - 25},
-				 {centerX, centerY - 35}, GRAY);
-	// Jelec (crossguard)
-	DrawRectangle(centerX - 12, centerY + 8, 24, 4, DARKGRAY);
-	// Rękojeść i głowica
-	DrawRectangle(centerX - 2, centerY + 12, 4, 12, BROWN);
-	DrawCircle(centerX, centerY + 26, 4, GOLD);
-}
+void SwordCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
 
 std::string SwordCard::GetValueText() const {
 	return std::to_string(attack);
@@ -245,24 +218,10 @@ bool SwordCard::Interact(PlayerCard &player) {
 HealthPotionCard::HealthPotionCard() {
 	name = "HP POTION";
 	amount = GetRandomValue(3, 12);
+	textureId = TextureId::FLASK_0;
 }
 
-void HealthPotionCard::RenderContent(Vector2 offset, Vector2 cellSize) {
-	float centerX = offset.x + cellSize.x / 2.0f;
-	float centerY = offset.y + cellSize.y / 2.0f;
-
-	// Rysujemy buteleczkę mikstury z płynem
-	// Szyjka butelki
-	DrawRectangle(centerX - 4, centerY - 22, 8, 8, DARKGRAY);
-	// Korek
-	DrawRectangle(centerX - 6, centerY - 26, 12, 4, BROWN);
-	// Korpus (bańka)
-	DrawCircle(centerX, centerY + 4, 16, Fade(RED, 0.4f));
-	DrawCircleLines(centerX, centerY + 4, 16, RED);
-
-	// Biały refleks świetlny na miksturze
-	DrawCircle(centerX - 5, centerY, 3, Fade(WHITE, 0.6f));
-}
+void HealthPotionCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
 
 std::string HealthPotionCard::GetValueText() const {
 	return std::to_string(amount);
@@ -279,24 +238,10 @@ bool HealthPotionCard::Interact(PlayerCard &player) {
 ManaPotionCard::ManaPotionCard() {
 	name = "MANA POTION";
 	amount = GetRandomValue(3, 12);
+	textureId = TextureId::FLASK_1;
 }
 
-void ManaPotionCard::RenderContent(Vector2 offset, Vector2 cellSize) {
-	float centerX = offset.x + cellSize.x / 2.0f;
-	float centerY = offset.y + cellSize.y / 2.0f;
-
-	// Rysujemy buteleczkę mikstury z płynem
-	// Szyjka butelki
-	DrawRectangle(centerX - 4, centerY - 22, 8, 8, DARKGRAY);
-	// Korek
-	DrawRectangle(centerX - 6, centerY - 26, 12, 4, BROWN);
-	// Korpus (bańka)
-	DrawCircle(centerX, centerY + 4, 16, Fade(BLUE, 0.4f));
-	DrawCircleLines(centerX, centerY + 4, 16, BLUE);
-
-	// Biały refleks świetlny na miksturze
-	DrawCircle(centerX - 5, centerY, 3, Fade(WHITE, 0.6f));
-}
+void ManaPotionCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
 
 std::string ManaPotionCard::GetValueText() const {
 	return std::to_string(amount);
@@ -313,6 +258,7 @@ bool ManaPotionCard::Interact(PlayerCard &player) {
 TrapCard::TrapCard() {
 	name = "TRAP";
 	attack = GetRandomValue(1, 8);
+	textureId = TextureId::TRAP_0;
 }
 
 void TrapCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
@@ -324,4 +270,36 @@ std::string TrapCard::GetValueText() const {
 bool TrapCard::Interact(PlayerCard &player) {
 	player.hp -= attack;
 	return true;
+}
+
+CoinCard::CoinCard() {
+	name = "COIN";
+	value = GetRandomValue(2, 12);
+	textureId = TextureId::ENEMY_0;
+}
+
+void CoinCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
+
+std::string CoinCard::GetValueText() const {
+	return std::to_string(value);
+}
+
+bool CoinCard::Interact(PlayerCard &player) {
+	player.coins += value;
+	return true;
+}
+
+ChestCard::ChestCard() {
+	name = "CHEST";
+	textureId = TextureId::CHEST_0;
+}
+
+void ChestCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
+
+std::string ChestCard::GetValueText() const {
+	return "";
+}
+
+bool ChestCard::Interact(PlayerCard &player) {
+	return false;
 }

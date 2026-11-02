@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../core/textureManager.hpp"
+
 #include <memory>
 #include <raylib.h>
 #include <string>
@@ -12,7 +14,7 @@ class Card {
 	Card() = default;
 	virtual ~Card() = default;
 
-	virtual void Render(Vector2 offset, Vector2 cellSize);
+	virtual void Render(Vector2 offset, Vector2 cellSize, TextureManager &tm);
 
   protected:
 	virtual void RenderContent(Vector2 offset, Vector2 cellSize) = 0;
@@ -24,6 +26,8 @@ class Card {
 
 	int hp;
 	std::string name;
+
+	TextureId textureId;
 };
 
 class PlayerCard : public Card {
@@ -115,4 +119,30 @@ class TrapCard : public Card {
 	bool Interact(PlayerCard &player) override;
 
 	int attack;
+};
+
+class CoinCard : public Card {
+  public:
+	CoinCard();
+	~CoinCard() override = default;
+
+	void RenderContent(Vector2 offset, Vector2 cellSize) override;
+
+	[[nodiscard]] std::string GetValueText() const override;
+
+	bool Interact(PlayerCard &player) override;
+
+	int value;
+};
+
+class ChestCard : public Card {
+  public:
+	ChestCard();
+	~ChestCard() override = default;
+
+	void RenderContent(Vector2 offset, Vector2 cellSize) override;
+
+	[[nodiscard]] std::string GetValueText() const override;
+
+	bool Interact(PlayerCard &player) override;
 };

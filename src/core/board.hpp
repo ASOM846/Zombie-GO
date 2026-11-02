@@ -5,13 +5,14 @@
 #include <vector>
 
 #include "../entity/card.hpp"
+#include "textureManager.hpp"
 
 class Board {
   public:
 	void Init();
 
 	void Update();
-	void Render();
+	void Render(TextureManager &tm);
 
 	void HandleSwipeDown();
 	void HandleSwipeUp();
