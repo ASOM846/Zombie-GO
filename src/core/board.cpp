@@ -16,7 +16,32 @@ void Board::Init() {
 	board[1][1] = std::make_shared<PlayerCard>();
 }
 
-void Board::Update() {}
+void Board::Update() {
+	float dt = GetFrameTime();
+
+	Vector2 offset{
+		static_cast<float>(
+			(GetScreenWidth() - (cellWidth * boardX + spacing * (boardX - 1))) /
+			2),
+		static_cast<float>((GetScreenHeight() -
+							(cellHeight * boardY + spacing * (boardY - 1))) /
+						   2)};
+
+	Vector2 cellSize = {static_cast<float>(cellWidth),
+						static_cast<float>(cellHeight)};
+
+	for (int y = 0; y < boardY; y++) {
+		for (int x = 0; x < boardX; x++) {
+			auto &card = board[y][x];
+
+			Vector2 target{offset.x + (cellWidth + spacing) * x,
+						   offset.y + (cellHeight + spacing) * y};
+
+			card->SetTargetPos(target);
+			card->UpdateAnimation(dt);
+		}
+	}
+}
 
 void Board::Render(TextureManager &tm) {
 	Vector2 offset{
@@ -35,7 +60,7 @@ void Board::Render(TextureManager &tm) {
 			Vector2 cellSize = {static_cast<float>(cellWidth),
 								static_cast<float>(cellHeight)};
 
-			board[y][x]->Render(finalPos, cellSize, tm);
+			board[y][x]->Render(board[y][x]->renderPos, cellSize, tm);
 		}
 	}
 }

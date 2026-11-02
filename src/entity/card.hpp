@@ -17,12 +17,26 @@ class Card {
 	virtual void Render(Vector2 offset, Vector2 cellSize, TextureManager &tm);
 
   protected:
-	virtual void RenderContent(Vector2 offset, Vector2 cellSize) = 0;
+	virtual void RenderContent(Vector2 offset, Vector2 cellSize,
+							   TextureManager &tm) = 0;
 
 	[[nodiscard]] virtual std::string GetValueText() const = 0;
 
   public:
 	virtual bool Interact(PlayerCard &player) = 0;
+
+	Vector2 renderPos{0, 0};
+	Vector2 targetPos{0, 0};
+
+	void SetTargetPos(Vector2 target);
+
+	bool isAnimating{false};
+	bool hasRenderPosition;
+
+	void UpdateAnimation(float dt);
+
+	float scale = 0.0f;
+	bool isSpawning = true;
 
 	int hp;
 	std::string name;
@@ -35,7 +49,8 @@ class PlayerCard : public Card {
 	PlayerCard();
 	~PlayerCard() override = default;
 
-	void RenderContent(Vector2 offset, Vector2 cellSize) override;
+	void RenderContent(Vector2 offset, Vector2 cellSize,
+					   TextureManager &tm) override;
 
 	[[nodiscard]] std::string GetValueText() const override;
 
@@ -56,7 +71,8 @@ class EnemyCard : public Card {
 	EnemyCard();
 	~EnemyCard() override = default;
 
-	void RenderContent(Vector2 position, Vector2 cellSize) override;
+	void RenderContent(Vector2 offset, Vector2 cellSize,
+					   TextureManager &tm) override;
 
 	[[nodiscard]] std::string GetValueText() const override;
 
@@ -70,7 +86,8 @@ class SwordCard : public Card {
 	SwordCard();
 	~SwordCard() override = default;
 
-	void RenderContent(Vector2 offset, Vector2 cellSize) override;
+	void RenderContent(Vector2 offset, Vector2 cellSize,
+					   TextureManager &tm) override;
 
 	[[nodiscard]] std::string GetValueText() const override;
 
@@ -84,7 +101,8 @@ class HealthPotionCard : public Card {
 	HealthPotionCard();
 	~HealthPotionCard() override = default;
 
-	void RenderContent(Vector2 offset, Vector2 cellSize) override;
+	void RenderContent(Vector2 position, Vector2 cellSize,
+					   TextureManager &tm) override;
 
 	[[nodiscard]] std::string GetValueText() const override;
 
@@ -98,7 +116,8 @@ class ManaPotionCard : public Card {
 	ManaPotionCard();
 	~ManaPotionCard() override = default;
 
-	void RenderContent(Vector2 offset, Vector2 cellSize) override;
+	void RenderContent(Vector2 position, Vector2 cellSize,
+					   TextureManager &tm) override;
 
 	[[nodiscard]] std::string GetValueText() const override;
 
@@ -112,7 +131,8 @@ class TrapCard : public Card {
 	TrapCard();
 	~TrapCard() override = default;
 
-	void RenderContent(Vector2 offset, Vector2 cellSize) override;
+	void RenderContent(Vector2 position, Vector2 cellSize,
+					   TextureManager &tm) override;
 
 	[[nodiscard]] std::string GetValueText() const override;
 
@@ -126,7 +146,8 @@ class CoinCard : public Card {
 	CoinCard();
 	~CoinCard() override = default;
 
-	void RenderContent(Vector2 offset, Vector2 cellSize) override;
+	void RenderContent(Vector2 position, Vector2 cellSize,
+					   TextureManager &tm) override;
 
 	[[nodiscard]] std::string GetValueText() const override;
 
@@ -140,7 +161,8 @@ class ChestCard : public Card {
 	ChestCard();
 	~ChestCard() override = default;
 
-	void RenderContent(Vector2 offset, Vector2 cellSize) override;
+	void RenderContent(Vector2 position, Vector2 cellSize,
+					   TextureManager &tm) override;
 
 	[[nodiscard]] std::string GetValueText() const override;
 

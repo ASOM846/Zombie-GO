@@ -1,119 +1,189 @@
 #include "card.hpp"
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <raylib.h>
 #include <string>
 #include <vector>
 
 void Card::Render(Vector2 position, Vector2 cellSize, TextureManager &tm) {
-	float centerX = position.x + cellSize.x / 2.0f;
-	float centerY = position.y + cellSize.y / 2.0f;
+	const float s = scale;
 
-	int width = cellSize.x;
-	int height = cellSize.y;
+	const float centerX = position.x + cellSize.x / 2.0f;
+	const float centerY = position.y + cellSize.y / 2.0f;
+
+	auto transform = [&](float x, float y) -> Vector2 {
+		return {centerX + (x - centerX) * s, centerY + (y - centerY) * s};
+	};
+
+	auto drawRect = [&](float x, float y, float w, float h, Color color) {
+		Vector2 p = transform(x, y);
+
+		DrawRectangle(static_cast<int>(p.x), static_cast<int>(p.y),
+					  static_cast<int>(w * s), static_cast<int>(h * s), color);
+	};
+
+	auto drawLine = [&](Vector2 start, Vector2 end, float thickness,
+						Color color) {
+		Vector2 a = transform(start.x, start.y);
+		Vector2 b = transform(end.x, end.y);
+
+		DrawLineEx(a, b, thickness * s, color);
+	};
+
+	auto drawCircle = [&](float x, float y, float radius, Color color) {
+		Vector2 p = transform(x, y);
+		DrawCircleV(p, radius * s, color);
+	};
 
 	const auto shadow = Color{0, 0, 0, 100};
 	const auto darkWood = Color{60, 30, 15, 255};
 	const auto parchment = Color{220, 200, 170, 255};
 	const auto goldAccent = Color{180, 130, 40, 255};
 
-	DrawRectangle(position.x + 4, position.y + 4, width, height, shadow);
-	DrawRectangle(position.x, position.y, width, height, darkWood);
+	const float width = cellSize.x;
+	const float height = cellSize.y;
+
+	drawRect(position.x + 4, position.y + 4, width, height, shadow);
+	drawRect(position.x, position.y, width, height, darkWood);
 
 	const float border = 6;
-	float bgX = position.x + border;
-	float bgY = position.y + border;
-	float bgW = width - (2 * border);
-	float bgH = height - (2 * border);
 
-	DrawRectangle(position.x + border, position.y + border,
-				  width - (2 * border), height - (2 * border), parchment);
+	drawRect(position.x + border, position.y + border, width - 2 * border,
+			 height - 2 * border, parchment);
 
-	int innerMargin = border + 4;
-	DrawRectangleLinesEx({position.x + static_cast<float>(innerMargin),
-						  position.y + static_cast<float>(innerMargin),
-						  static_cast<float>(width - (2 * innerMargin)),
-						  static_cast<float>(height - (innerMargin * 2))},
-						 2, goldAccent);
+	const float innerMargin = border + 4;
 
-	float cornerLen = 16.0F;
-	float thick = 4.0F;
-	float p = innerMargin;
+	DrawRectangleLinesEx(
+		{transform(position.x + innerMargin, position.y + innerMargin).x,
+		 transform(position.x + innerMargin, position.y + innerMargin).y,
+		 (width - 2 * innerMargin) * s, (height - 2 * innerMargin) * s},
+		2 * s, goldAccent);
+
+	const float cornerLen = 16.0f;
+	const float thick = 4.0f;
+	const float p = innerMargin;
 
 	Vector2 tl = {position.x + p, position.y + p};
-	DrawLineEx(tl, {tl.x + cornerLen, tl.y}, thick, goldAccent);
-	DrawLineEx(tl, {tl.x, tl.y + cornerLen}, thick, goldAccent);
-
 	Vector2 tr = {position.x + width - p, position.y + p};
-	DrawLineEx(tr, {tr.x - cornerLen, tr.y}, thick, goldAccent);
-	DrawLineEx(tr, {tr.x, tr.y + cornerLen}, thick, goldAccent);
-
 	Vector2 bl = {position.x + p, position.y + height - p};
-	DrawLineEx(bl, {bl.x + cornerLen, bl.y}, thick, goldAccent);
-	DrawLineEx(bl, {bl.x, bl.y - cornerLen}, thick, goldAccent);
-
 	Vector2 br = {position.x + width - p, position.y + height - p};
-	DrawLineEx(br, {br.x - cornerLen, br.y}, thick, goldAccent);
-	DrawLineEx(br, {br.x, br.y - cornerLen}, thick, goldAccent);
+
+	drawLine(tl, {tl.x + cornerLen, tl.y}, thick, goldAccent);
+	drawLine(tl, {tl.x, tl.y + cornerLen}, thick, goldAccent);
+
+	drawLine(tr, {tr.x - cornerLen, tr.y}, thick, goldAccent);
+	drawLine(tr, {tr.x, tr.y + cornerLen}, thick, goldAccent);
+
+	drawLine(bl, {bl.x + cornerLen, bl.y}, thick, goldAccent);
+	drawLine(bl, {bl.x, bl.y - cornerLen}, thick, goldAccent);
+
+	drawLine(br, {br.x - cornerLen, br.y}, thick, goldAccent);
+	drawLine(br, {br.x, br.y - cornerLen}, thick, goldAccent);
 
 	const float niteRadius = 3;
-	DrawCircle(tl.x, tl.y, niteRadius, darkWood);
-	DrawCircle(tr.x, tr.y, niteRadius, darkWood);
-	DrawCircle(bl.x, bl.y, niteRadius, darkWood);
-	DrawCircle(br.x, br.y, niteRadius, darkWood);
 
-	int fontSize = 20;
+	drawCircle(tl.x, tl.y, niteRadius, darkWood);
+	drawCircle(tr.x, tr.y, niteRadius, darkWood);
+	drawCircle(bl.x, bl.y, niteRadius, darkWood);
+	drawCircle(br.x, br.y, niteRadius, darkWood);
+
+	const int fontSize = 20;
 	const char *text = name.c_str();
-	int textWidth = MeasureText(text, fontSize);
-	int texX = position.x + width / 2 - textWidth / 2;
-	DrawText(text, texX, position.y + 16, fontSize, {40, 20, 10, 255});
+
+	const int textWidth = MeasureText(text, fontSize);
+
+	Vector2 namePos = transform(centerX - textWidth / 2.0f, position.y + 16);
+
+	DrawText(text, static_cast<int>(namePos.x), static_cast<int>(namePos.y),
+			 std::max(1, static_cast<int>(fontSize * s)), {40, 20, 10, 255});
 
 	const float sepY = position.y + 42;
-	DrawLineEx({position.x + 14, sepY}, {position.x + width - 14, sepY}, 2,
-			   goldAccent);
-	DrawCircle(position.x + 14, sepY, 2, darkWood);
-	DrawCircle(position.x + width - 14, sepY, 2, darkWood);
 
-	const char *valueStr = GetValueText().c_str();
-	// if (topCard->maxValue == -1 || topCard->minValue == -1) {
-	// 	valueStr = TextFormat("%d", topCard->hp);
-	// } else {
-	// 	valueStr = TextFormat("%d | %d", topCard->minValue, topCard->maxValue);
-	// }
-	//
-	// if (topCard->type == CardType::PLAYER) {
-	// 	valueStr = TextFormat("%d | %d", topCard->hp, topCard->maxValue);
-	// }
+	drawLine({position.x + 14, sepY}, {position.x + width - 14, sepY}, 2,
+			 goldAccent);
+
+	drawCircle(position.x + 14, sepY, 2, darkWood);
+	drawCircle(position.x + width - 14, sepY, 2, darkWood);
 
 	const float sepYBottom = position.y + height - 46;
-	DrawLineEx({position.x + 14, sepYBottom},
-			   {position.x + width - 14, sepYBottom}, 2, goldAccent);
-	DrawCircle(position.x + 14, sepYBottom, 2, darkWood);
-	DrawCircle(position.x + width - 14, sepYBottom, 2, darkWood);
-	//
-	fontSize = 24;
-	textWidth = MeasureText(valueStr, fontSize);
-	int valTextX = centerX - textWidth / 2;
-	int valTextY = sepYBottom + 8;
 
-	auto valueColor = Color{50, 30, 20, 255};
-	// if (topCard->type == CardType::ENEMY)
-	// 	valueColor = Color{150, 25, 25, 255};
-	// if (topCard->type == CardType::POTION)
-	// 	valueColor = Color{25, 110, 25, 255};
+	drawLine({position.x + 14, sepYBottom},
+			 {position.x + width - 14, sepYBottom}, 2, goldAccent);
+
+	drawCircle(position.x + 14, sepYBottom, 2, darkWood);
+	drawCircle(position.x + width - 14, sepYBottom, 2, darkWood);
+
+	std::string valueStr = GetValueText();
+
+	const int valueFontSize = 24;
+	const int valueWidth = MeasureText(valueStr.c_str(), valueFontSize);
+
+	Vector2 valuePos = transform(centerX - valueWidth / 2.0f, sepYBottom + 8);
+
+	DrawText(valueStr.c_str(), static_cast<int>(valuePos.x),
+			 static_cast<int>(valuePos.y),
+			 std::max(1, static_cast<int>(valueFontSize * s)),
+			 {50, 30, 20, 255});
 
 	const Texture2D &texture = tm.get(textureId);
 
-	float scale = 3.0F;
+	const float textureScale = 3.0f;
 
-	float drawX = centerX - (texture.width * scale) / 2.0f;
-	float drawY = centerY - (texture.height * scale) / 2.0f;
+	float drawX = centerX - (texture.width * textureScale) / 2.0f;
+	float drawY = centerY - (texture.height * textureScale) / 2.0f;
 
-	DrawTextureEx(texture, {drawX, drawY - 5 * scale}, 0.0f, scale, RAYWHITE);
+	Vector2 texturePos = transform(drawX, drawY - 5 * textureScale);
 
-	DrawText(valueStr, valTextX, valTextY, fontSize, valueColor);
+	DrawTextureEx(texture, texturePos, 0.0f, textureScale * s, RAYWHITE);
 
-	RenderContent(position, cellSize);
+	Vector2 contentPos = transform(position.x, position.y);
+
+	RenderContent(contentPos, {cellSize.x * s, cellSize.y * s}, tm);
+}
+
+void Card::SetTargetPos(Vector2 target) {
+	targetPos = target;
+
+	if (isSpawning)
+		renderPos = targetPos;
+
+	if (!hasRenderPosition) {
+		renderPos = target;
+		hasRenderPosition = true;
+	}
+
+	float dx = target.x - renderPos.x;
+	float dy = target.y - renderPos.y;
+
+	isAnimating = dx * dx + dy * dy > 0.1f;
+}
+
+void Card::UpdateAnimation(float dt) {
+	if (isSpawning) {
+		scale += 4.0f * dt;
+		if (scale >= 1.0f) {
+			scale = 1.0f;
+			isSpawning = false;
+		}
+	}
+
+	if (!isAnimating)
+		return;
+
+	float speed = 12.0f;
+	float t = 1.0f - expf(-speed * dt);
+
+	renderPos.x += (targetPos.x - renderPos.x) * t;
+	renderPos.y += (targetPos.y - renderPos.y) * t;
+
+	float distanceX = targetPos.x - renderPos.x;
+	float distanceY = targetPos.y - renderPos.y;
+
+	if (distanceX * distanceX + distanceY * distanceY < 0.5f) {
+		renderPos = targetPos;
+		isAnimating = false;
+	}
 }
 
 PlayerCard::PlayerCard() {
@@ -134,7 +204,24 @@ PlayerCard::PlayerCard() {
 	textureId = TextureId::KNIGHT;
 }
 
-void PlayerCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
+void PlayerCard::RenderContent(Vector2 offset, Vector2 cellSize,
+							   TextureManager &tm) {
+
+	float centerX = offset.x + cellSize.x / 2.0f;
+	float centerY = offset.y + cellSize.y / 2.0f;
+
+	// int width = cellSize.x;
+	// int height = cellSize.y;
+	//
+	const Texture2D &texture = tm.get(currentWeapon->textureId);
+
+	float scale = 3.0F;
+
+	float drawX = centerX - (texture.width * scale) / 2.0f - cellSize.x / 4;
+	float drawY = centerY - (texture.height * scale) / 2.0f;
+
+	DrawTextureEx(texture, {drawX, drawY - 5 * scale}, 0.0f, scale, RAYWHITE);
+}
 
 std::string PlayerCard::GetValueText() const {
 	return std::string{std::to_string(hp) + "/" + std::to_string(maxHp) +
@@ -160,7 +247,8 @@ EnemyCard::EnemyCard() {
 	textureId = GetRandomTexture();
 }
 
-void EnemyCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
+void EnemyCard::RenderContent(Vector2 offset, Vector2 cellSize,
+							  TextureManager &tm) {}
 
 std::string EnemyCard::GetValueText() const {
 	return std::to_string(hp);
@@ -203,7 +291,8 @@ SwordCard::SwordCard() {
 	textureId = TextureId::WEAPON_0;
 }
 
-void SwordCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
+void SwordCard::RenderContent(Vector2 offset, Vector2 cellSize,
+							  TextureManager &tm) {}
 
 std::string SwordCard::GetValueText() const {
 	return std::to_string(attack);
@@ -221,7 +310,8 @@ HealthPotionCard::HealthPotionCard() {
 	textureId = TextureId::FLASK_0;
 }
 
-void HealthPotionCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
+void HealthPotionCard::RenderContent(Vector2 offset, Vector2 cellSize,
+									 TextureManager &tm) {}
 
 std::string HealthPotionCard::GetValueText() const {
 	return std::to_string(amount);
@@ -241,7 +331,8 @@ ManaPotionCard::ManaPotionCard() {
 	textureId = TextureId::FLASK_1;
 }
 
-void ManaPotionCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
+void ManaPotionCard::RenderContent(Vector2 offset, Vector2 cellSize,
+								   TextureManager &tm) {}
 
 std::string ManaPotionCard::GetValueText() const {
 	return std::to_string(amount);
@@ -261,7 +352,8 @@ TrapCard::TrapCard() {
 	textureId = TextureId::TRAP_0;
 }
 
-void TrapCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
+void TrapCard::RenderContent(Vector2 offset, Vector2 cellSize,
+							 TextureManager &tm) {}
 
 std::string TrapCard::GetValueText() const {
 	return std::to_string(attack);
@@ -278,7 +370,8 @@ CoinCard::CoinCard() {
 	textureId = TextureId::ENEMY_0;
 }
 
-void CoinCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
+void CoinCard::RenderContent(Vector2 offset, Vector2 cellSize,
+							 TextureManager &tm) {}
 
 std::string CoinCard::GetValueText() const {
 	return std::to_string(value);
@@ -294,7 +387,8 @@ ChestCard::ChestCard() {
 	textureId = TextureId::CHEST_0;
 }
 
-void ChestCard::RenderContent(Vector2 offset, Vector2 cellSize) {}
+void ChestCard::RenderContent(Vector2 offset, Vector2 cellSize,
+							  TextureManager &tm) {}
 
 std::string ChestCard::GetValueText() const {
 	return "";
