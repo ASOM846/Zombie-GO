@@ -63,7 +63,7 @@ void DrawCardBase(float centerX, float centerY, Vector2 position,
 	Color topColor = card.gradientColor;
 	// Color bottomColor = {card.gradientColor.r, card.gradientColor.g,
 	// 					 card.gradientColor.b, 0};
-	Color bottomColor = BLANK;
+	auto bottomColor = BLANK;
 
 	DrawRectangleGradientEx({gradTL.x, gradTL.y, (width - 2 * border) * s,
 							 (height - 2 * border) * s},
@@ -153,5 +153,67 @@ void DrawCardBase(float centerX, float centerY, Vector2 position,
 	Vector2 texturePos = transform(drawX, drawY);
 
 	DrawTextureEx(texture, texturePos, 0.0f, textureScale * s, RAYWHITE);
+}
+
+void DrawButton(const Rectangle &dst, const char *text, float shadowOffset,
+				const Font &font) {
+	const auto shadow = Color{0, 0, 0, 100};
+	const auto darkWood = Color{60, 30, 15, 255};
+	const auto parchment = Color{220, 200, 170, 255};
+	const auto goldAccent = Color{180, 130, 40, 255};
+
+	DrawRectangle(dst.x + shadowOffset, dst.y + shadowOffset, dst.width,
+				  dst.height, shadow);
+	DrawRectangle(dst.x, dst.y, dst.width, dst.height, darkWood);
+
+	const float border = 6;
+	DrawRectangle(dst.x + border, dst.y + border, dst.width - (2 * border),
+				  dst.height - (2 * border), parchment);
+
+	int innerMargin = border + 4;
+	DrawRectangleLinesEx({dst.x + static_cast<float>(innerMargin),
+						  dst.y + static_cast<float>(innerMargin),
+						  static_cast<float>(dst.width - (2 * innerMargin)),
+						  static_cast<float>(dst.height - (innerMargin * 2))},
+						 2, goldAccent);
+
+	float cornerLen = 16.0F;
+	float thick = 4.0F;
+	float p = innerMargin;
+
+	Vector2 tl = {dst.x + p, dst.y + p};
+	DrawLineEx(tl, {tl.x + cornerLen, tl.y}, thick, goldAccent);
+	DrawLineEx(tl, {tl.x, tl.y + cornerLen}, thick, goldAccent);
+
+	Vector2 tr = {dst.x + dst.width - p, dst.y + p};
+	DrawLineEx(tr, {tr.x - cornerLen, tr.y}, thick, goldAccent);
+	DrawLineEx(tr, {tr.x, tr.y + cornerLen}, thick, goldAccent);
+
+	Vector2 bl = {dst.x + p, dst.y + dst.height - p};
+	DrawLineEx(bl, {bl.x + cornerLen, bl.y}, thick, goldAccent);
+	DrawLineEx(bl, {bl.x, bl.y - cornerLen}, thick, goldAccent);
+
+	Vector2 br = {dst.x + dst.width - p, dst.y + dst.height - p};
+	DrawLineEx(br, {br.x - cornerLen, br.y}, thick, goldAccent);
+	DrawLineEx(br, {br.x, br.y - cornerLen}, thick, goldAccent);
+
+	const float niteRadius = 3;
+	DrawCircle(tl.x, tl.y, niteRadius, darkWood);
+	DrawCircle(tr.x, tr.y, niteRadius, darkWood);
+	DrawCircle(bl.x, bl.y, niteRadius, darkWood);
+	DrawCircle(br.x, br.y, niteRadius, darkWood);
+
+	float fontSize = 20.0f;
+
+	if (font.texture.id != GetFontDefault().texture.id)
+		fontSize = 40.0f;
+	float fontSpacing = 1.0f;
+
+	Vector2 textSize = MeasureTextEx(font, text, fontSize, fontSpacing);
+
+	float textX = (dst.x + dst.width / 2.0f) - (textSize.x / 2.0f);
+	float textY = (dst.y + dst.height / 2.0f) - (textSize.y / 2.0f);
+
+	DrawTextEx(font, text, {textX, textY}, fontSize, fontSpacing, darkWood);
 }
 } // namespace gfx

@@ -1,4 +1,5 @@
 #pragma once
+#include "../graphics/gfx.hpp"
 #include <raylib.h>
 
 struct Button {
@@ -33,16 +34,17 @@ struct Button {
 	}
 
 	void Draw(const Font &font) const {
-		// Ui::DrawMessageRect(rect, text, shadowOffset, font);
-		DrawRectangleRec(rect, MAGENTA);
+		gfx::DrawButton(rect, text, shadowOffset, font);
 
-		Vector2 textSize =
-			MeasureTextEx(GetFontDefault(), text, fontSize, fontSpacing);
+		// DrawRectangleRec(rect, MAGENTA);
 
-		Vector2 finalPos = {{rect.x + rect.width / 2 - textSize.x / 2},
-							{rect.y + rect.height / 2 - textSize.y / 2}};
+		// Vector2 textSize =
+		MeasureTextEx(GetFontDefault(), text, fontSize, fontSpacing);
 
-		DrawTextEx(GetFontDefault(), text, finalPos, fontSize, fontSpacing,
-				   WHITE);
+		// Vector2 finalPos = {{rect.x + rect.width / 2 - textSize.x / 2},
+		//	{rect.y + rect.height / 2 - textSize.y / 2}};
+
+		// DrawTextEx(GetFontDefault(), text, finalPos,
+		// fontSize, fontSpacing, WHITE);
 	}
 };

@@ -6,15 +6,6 @@
 #include <raymath.h>
 
 void Game::Init() {
-	TraceLog(LOG_WARNING, "GAME INIT START");
-
-	TraceLog(LOG_WARNING, "WORKING DIR: %s", GetWorkingDirectory());
-
-	TraceLog(LOG_WARNING, "KNIGHT EXISTS: %d",
-			 FileExists("assets/knight0.png"));
-
-	TraceLog(LOG_WARNING, "TEXTURES LOADED");
-
 	textureManager.loadAll();
 
 	board.Init();
@@ -23,6 +14,8 @@ void Game::Init() {
 	currentState = GameState::BOARD;
 
 	spellsButton.text = "SPELLS";
+
+	UpdateButtonPos();
 }
 
 int Game::InterpreateGesture() {
@@ -40,24 +33,20 @@ int Game::InterpreateGesture() {
 
 void Game::Update() {
 	lastGesture = currentGesture;
-	touchArea = {.x = 0,
-				 .y = 0,
-				 .width = static_cast<float>(GetRenderWidth()),
-				 .height = static_cast<float>(GetRenderHeight())};
 
 	board.Update(screenShake);
 	screenShake.update(GetFrameTime());
 
+	UpdateButtonPos();
+
 	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 		touchStartPos = GetMousePosition();
-		std::cout << "1 position registered\n";
 	}
 
 	if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
 		touchEndPos = GetMousePosition();
 		currentGesture = InterpreateGesture();
 		lastGesture = -1;
-		std::cout << "3 position interpreted\n";
 	}
 
 	if (wasActionTaken) {
@@ -65,26 +54,16 @@ void Game::Update() {
 		wasActionTaken = false;
 	}
 
-	int btnWidth = 100;
-	int btnHeight = 50;
-	spellsButton.rect = {
-		.x = static_cast<float>(GetScreenWidth() / 2 - btnWidth / 2),
-		.y = static_cast<float>(GetScreenHeight() - 40 - btnHeight),
-		.width = static_cast<float>(btnWidth),
-		.height = static_cast<float>(btnHeight)};
-
 	if (spellsButton.IsClicked(GetMousePosition())) {
 		currentState == GameState::SPELLS ? currentState = GameState::BOARD
 										  : currentState = GameState::SPELLS;
 	}
 
-	if (IsKeyPressed(KEY_M)) {
-		screenShake.trigger();
-	}
+	spellsButton.Update(GetMousePosition());
 
 	switch (currentState) {
 	case GameState::BOARD:
-		if (CheckCollisionPointRec(touchStartPos, touchArea) &&
+		if (CheckCollisionPointRec(touchStartPos, board.GetTouchRec()) &&
 			(currentGesture != GESTURE_NONE)) {
 			if (currentGesture != lastGesture) {
 				switch (currentGesture) {
@@ -193,4 +172,15 @@ void Game::RenderLose() {
 
 	DrawTextEx(GetFontDefault(), text.c_str(), finalPos, fontSize, spacing,
 			   RED);
+}
+
+void Game::UpdateButtonPos() {
+	int btnWidth = 100;
+	int btnHeight = 50;
+
+	spellsButton.rect = {
+		.x = static_cast<float>(GetScreenWidth() / 2 - btnWidth / 2),
+		.y = static_cast<float>(GetScreenHeight() - 40 - btnHeight),
+		.width = static_cast<float>(btnWidth),
+		.height = static_cast<float>(btnHeight)};
 }

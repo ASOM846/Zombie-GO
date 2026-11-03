@@ -16,6 +16,8 @@ void Menu::Update() {
 	if (startGameButton.IsClicked(GetMousePosition())) {
 		shouldGameStart = true;
 	}
+
+	startGameButton.Update(GetMousePosition());
 }
 
 void Menu::Render() {

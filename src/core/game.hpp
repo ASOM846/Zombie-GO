@@ -30,16 +30,15 @@ class Game {
 	Vector2 touchStartPos;
 	Vector2 touchEndPos;
 
-	Rectangle touchArea{0, 0, 1920, 1080};
-
   private:
 	void RenderLose();
-
+	void UpdateButtonPos();
 	GameState currentState;
 
 	Board board;
 
 	SpellPage spellPage;
+
 	Button spellsButton;
 
 	int currentGesture;
