@@ -45,7 +45,7 @@ class Card {
 	int hp;
 	std::string name;
 
-	Color gradientColor{RAYWHITE};
+	Color gradientColor{BLANK};
 	TextureId textureId;
 };
 

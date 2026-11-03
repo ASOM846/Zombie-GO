@@ -36,13 +36,6 @@ void DrawCardBase(float centerX, float centerY, Vector2 position,
 	int radius = cellSize.x / 2 * card.scale;
 	int size = radius * 2;
 
-	Image alphaCircleImg =
-		GenImageGradientRadial(size, size, 0.0f, card.gradientColor, BLANK);
-
-	Texture2D circleTexture = LoadTextureFromImage(alphaCircleImg);
-
-	UnloadImage(alphaCircleImg);
-
 	const auto shadow = Color{0, 0, 0, 100};
 	const auto darkWood = Color{60, 30, 15, 255};
 	const auto parchment = Color{220, 200, 170, 255};
@@ -58,6 +51,23 @@ void DrawCardBase(float centerX, float centerY, Vector2 position,
 
 	drawRect(position.x + border, position.y + border, width - 2 * border,
 			 height - 2 * border, parchment);
+
+	Vector2 gradTL = transform(position.x + border, position.y + border);
+	Vector2 gradTR =
+		transform(position.x + width - border, position.y + border);
+	Vector2 gradBR =
+		transform(position.x + width - border, position.y + height - border);
+	Vector2 gradBL =
+		transform(position.x + border, position.y + height - border);
+
+	Color topColor = card.gradientColor;
+	// Color bottomColor = {card.gradientColor.r, card.gradientColor.g,
+	// 					 card.gradientColor.b, 0};
+	Color bottomColor = BLANK;
+
+	DrawRectangleGradientEx({gradTL.x, gradTL.y, (width - 2 * border) * s,
+							 (height - 2 * border) * s},
+							topColor, bottomColor, topColor, bottomColor);
 
 	const float innerMargin = border + 4;
 
@@ -142,13 +152,6 @@ void DrawCardBase(float centerX, float centerY, Vector2 position,
 
 	Vector2 texturePos = transform(drawX, drawY);
 
-	float gradientDrawX = centerX - (circleTexture.width * s) / 2.0f;
-	float gradientDrawY = centerY - (circleTexture.height * s) / 2.0f;
-	Vector2 gradientPos = transform(gradientDrawX, gradientDrawY);
-
-	// DrawTextureEx(circleTexture, gradientPos, 0.0f, s, RAYWHITE);
 	DrawTextureEx(texture, texturePos, 0.0f, textureScale * s, RAYWHITE);
-
-	UnloadTexture(circleTexture);
 }
 } // namespace gfx

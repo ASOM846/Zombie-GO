@@ -25,6 +25,8 @@ class Board {
 
 	std::shared_ptr<Card> GetCellAtPosition(Vector2 posistion);
 
+	Rectangle const &GetTouchRec() { return touchRec; };
+
 	void RecalculateDrawindVariables();
 
   private:
@@ -36,6 +38,8 @@ class Board {
 
 	std::vector<std::vector<std::shared_ptr<Card>>> board;
 
+	Rectangle touchRec{};
+
 	const int boardY = 3;
 	const int boardX = 3;
 
@@ -46,6 +50,6 @@ class Board {
 
 	const int spacing = 30;
 
-	Vector2 minOffset{0, 200};
+	Vector2 minOffset{0, 100};
 	Vector2 boardOffset{};
 };

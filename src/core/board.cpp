@@ -290,28 +290,31 @@ void Board::RecalculateDrawindVariables() {
 	int screenWidth = GetScreenWidth();
 	int screenHeight = GetScreenHeight();
 
-	int virtualScreenWidth = screenWidth - minOffset.x;
-	int virtualScreenHeight = screenHeight - minOffset.y;
+	touchRec = {.x = minOffset.x,
+				.y = minOffset.y,
+				.width = static_cast<float>(screenWidth - minOffset.x * 2),
+				.height = static_cast<float>(screenHeight - minOffset.y * 2)};
 
-	int maxCellWidth = (virtualScreenWidth - (spacing * boardX + 1)) / boardX;
+	int maxCellWidth =
+		(static_cast<int>(touchRec.width) - (spacing * boardX + 1)) / boardX;
 	int maxCellHeight;
 
 	cellWidth = maxCellWidth;
-	cellHeight = maxCellWidth * 1.333333;
+	cellHeight = maxCellWidth * 1.333333f;
 
-	if ((cellHeight * boardY + (boardY + 1) * spacing) >= virtualScreenHeight) {
-		maxCellHeight = (virtualScreenHeight - (spacing * boardY + 1)) / boardY;
+	if ((cellHeight * boardY + (boardY + 1) * spacing) >= touchRec.height) {
+		maxCellHeight =
+			(static_cast<int>(touchRec.height) - (spacing * boardY + 1)) /
+			boardY;
 
-		cellWidth = maxCellHeight * 0.755555;
+		cellWidth = maxCellHeight * 0.755555f;
 		cellHeight = maxCellHeight;
 	}
 
-	boardOffset = {.x = static_cast<float>(
-					   (virtualScreenWidth -
-						(cellWidth * boardX + spacing * (boardX - 1))) /
-					   2),
-				   .y = static_cast<float>(
-					   (virtualScreenHeight + minOffset.y / 2 -
-						(cellHeight * boardY + spacing * (boardY - 1))) /
-					   2)};
+	float totalBoardWidth = (cellWidth * boardX + spacing * (boardX - 1));
+	float totalBoardHeight = (cellHeight * boardY + spacing * (boardY - 1));
+
+	boardOffset = {.x = touchRec.x + (touchRec.width - totalBoardWidth) / 2.0f,
+				   .y = touchRec.y +
+						(touchRec.height - totalBoardHeight) / 2.0f};
 }
