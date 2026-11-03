@@ -32,6 +32,8 @@ enum class TextureId {
 	WEAPON_5,
 	WEAPON_6,
 
+	ACTIVE_ENEMY_0,
+
 	ENEMY_0,
 	ENEMY_1,
 	ENEMY_2,
@@ -80,6 +82,8 @@ class TextureManager {
 		load(TextureId::WEAPON_4, "assets/weapon4.png");
 		load(TextureId::WEAPON_5, "assets/weapon5.png");
 		load(TextureId::WEAPON_6, "assets/weapon6.png");
+
+		load(TextureId::ACTIVE_ENEMY_0, "assets/mage0.png");
 
 		load(TextureId::ENEMY_0, "assets/enemy0.png");
 		load(TextureId::ENEMY_1, "assets/enemy1.png");

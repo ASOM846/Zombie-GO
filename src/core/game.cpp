@@ -28,6 +28,9 @@ void Game::Init() {
 int Game::InterpreateGesture() {
 	Vector2 diff = Vector2Subtract(touchEndPos, touchStartPos);
 
+	if (Vector2Distance(touchStartPos, touchEndPos) <= 50)
+		return GESTURE_NONE;
+
 	if (std::abs(diff.x) > std::abs(diff.y)) {
 		return diff.x > 0 ? GESTURE_SWIPE_RIGHT : GESTURE_SWIPE_LEFT;
 	}
@@ -102,6 +105,7 @@ void Game::Update() {
 					wasActionTaken = true;
 					break;
 				}
+				screenShake.trigger();
 			}
 		}
 

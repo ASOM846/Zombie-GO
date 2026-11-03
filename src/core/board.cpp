@@ -268,6 +268,7 @@ std::shared_ptr<Card> Board::GetRandomCard() {
 		weightedPool = {
 			{60, []() { return std::make_shared<EnemyCard>(); }},
 			{15, []() { return std::make_shared<TrapCard>(); }},
+			{10, []() { return std::make_shared<ActiveEnemyCard>(); }},
 			{10, []() { return std::make_shared<HealthPotionCard>(); }},
 			{10, []() { return std::make_shared<SpellRecepieCard>(); }},
 			{10, []() { return std::make_shared<ChestCard>(); }},

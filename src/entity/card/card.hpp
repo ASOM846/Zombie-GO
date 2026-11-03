@@ -1,12 +1,13 @@
 #pragma once
 
-#include "../textureManager.hpp"
-#include "spell/spell.hpp"
+#include "../../textureManager.hpp"
 
 #include <memory>
 #include <raylib.h>
 #include <string>
 #include <vector>
+
+class Spell;
 
 class PlayerCard;
 class SwordCard;
@@ -44,6 +45,7 @@ class Card {
 	int hp;
 	std::string name;
 
+	Color gradientColor{RAYWHITE};
 	TextureId textureId;
 };
 

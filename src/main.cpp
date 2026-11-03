@@ -3,6 +3,7 @@
 #include "core/game.hpp"
 #include "core/menu.hpp"
 #include "core/ui.hpp"
+#include "graphics/fpsGraph.hpp"
 
 enum class WindowState {
 	GAME,
@@ -32,6 +33,7 @@ int main() {
 	InitWindow(screenWidth, screenHeight, "VaultStep");
 
 	SetTargetFPS(60);
+	initFPSGraph(60, 300, 150);
 
 	Menu menu;
 	menu.Init();
@@ -74,6 +76,8 @@ int main() {
 
 			break;
 		}
+		tickFPSGraph(GetFPS());
+		drawFPSGraph(0, 0);
 		EndDrawing();
 	}
 

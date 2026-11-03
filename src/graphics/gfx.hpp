@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../entity/card.hpp"
+#include "../entity/card/card.hpp"
 #include <raylib.h>
 
 namespace gfx {
@@ -32,6 +32,16 @@ void DrawCardBase(float centerX, float centerY, Vector2 position,
 		Vector2 p = transform(x, y);
 		DrawCircleV(p, radius * s, color);
 	};
+
+	int radius = cellSize.x / 2 * card.scale;
+	int size = radius * 2;
+
+	Image alphaCircleImg =
+		GenImageGradientRadial(size, size, 0.0f, card.gradientColor, BLANK);
+
+	Texture2D circleTexture = LoadTextureFromImage(alphaCircleImg);
+
+	UnloadImage(alphaCircleImg);
 
 	const auto shadow = Color{0, 0, 0, 100};
 	const auto darkWood = Color{60, 30, 15, 255};
@@ -124,14 +134,21 @@ void DrawCardBase(float centerX, float centerY, Vector2 position,
 			 {50, 30, 20, 255});
 
 	const Texture2D &texture = tm.get(card.textureId);
-
 	const float textureScale = 3.0f;
 
 	float drawX = centerX - (texture.width * textureScale) / 2.0f;
-	float drawY = centerY - (texture.height * textureScale) / 2.0f;
+	float drawY =
+		centerY - (texture.height * textureScale) / 2.0f - (5 * textureScale);
 
-	Vector2 texturePos = transform(drawX, drawY - 5 * textureScale);
+	Vector2 texturePos = transform(drawX, drawY);
 
+	float gradientDrawX = centerX - (circleTexture.width * s) / 2.0f;
+	float gradientDrawY = centerY - (circleTexture.height * s) / 2.0f;
+	Vector2 gradientPos = transform(gradientDrawX, gradientDrawY);
+
+	// DrawTextureEx(circleTexture, gradientPos, 0.0f, s, RAYWHITE);
 	DrawTextureEx(texture, texturePos, 0.0f, textureScale * s, RAYWHITE);
+
+	UnloadTexture(circleTexture);
 }
 } // namespace gfx

@@ -3,7 +3,7 @@
 #include <raylib.h>
 #include <vector>
 
-#include "../entity/card.hpp"
+#include "../entity/card/card.hpp"
 #include "../entity/spell/spell.hpp"
 
 class SpellPage {

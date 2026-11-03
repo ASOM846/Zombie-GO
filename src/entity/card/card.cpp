@@ -1,5 +1,5 @@
 #include "card.hpp"
-#include "spell/spell.hpp"
+#include "../spell/spell.hpp"
 #include <algorithm>
 #include <cmath>
 #include <functional>
@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "../graphics/gfx.hpp"
+#include "../../graphics/gfx.hpp"
 
 void Card::Render(Vector2 position, Vector2 cellSize, TextureManager &tm) {
 
@@ -173,9 +173,7 @@ ActiveEnemyCard::ActiveEnemyCard() {
 	name = "ACTIVE ENEMY";
 
 	auto GetRandomTexture = []() {
-		std::vector<TextureId> textures{TextureId::ENEMY_0, TextureId::ENEMY_1,
-										TextureId::ENEMY_2, TextureId::ENEMY_3,
-										TextureId::ENEMY_4, TextureId::ENEMY_5};
+		std::vector<TextureId> textures{TextureId::ACTIVE_ENEMY_0};
 
 		int seed = GetRandomValue(0, textures.size() - 1);
 
@@ -183,6 +181,7 @@ ActiveEnemyCard::ActiveEnemyCard() {
 	};
 
 	textureId = GetRandomTexture();
+	gradientColor = RED;
 }
 
 void ActiveEnemyCard::RenderContent(Vector2 offset, Vector2 cellSize,
