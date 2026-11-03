@@ -9,9 +9,25 @@ enum class WindowState {
 	MENU,
 };
 
+void DrawBackground(const Texture2D &tex) {
+	Rectangle src{0, 0, static_cast<float>(tex.width),
+				  static_cast<float>(tex.height)};
+	Rectangle dst{0, 0, static_cast<float>(GetScreenWidth()),
+				  static_cast<float>(GetScreenHeight())};
+
+	DrawTexturePro(tex, src, dst, {0, 0}, 0.0f, WHITE);
+}
+
 int main() {
-	const int screenWidth = 800;
-	const int screenHeight = 450;
+	int screenWidth = 0;
+	int screenHeight = 0;
+
+	// #if defined(__ANDROID__)
+	// 	width = height = 0;
+	// #endif
+
+	SetWindowState(FLAG_WINDOW_RESIZABLE);
+	SetWindowState(FLAG_VSYNC_HINT);
 
 	InitWindow(screenWidth, screenHeight, "VaultStep");
 
@@ -31,20 +47,31 @@ int main() {
 		BeginDrawing();
 		ClearBackground(DARKBLUE);
 
+		DrawBackground(game.GetTextureManager()->get(TextureId::BCG_0));
+		DrawBackground(game.GetTextureManager()->get(TextureId::VIGNETTE_0));
+
 		switch (currentState) {
 		case WindowState::GAME:
-			game.Render();
-
-			ui.Render(game.GetBoard().GetPlayer());
 			game.Update();
 			break;
 		case WindowState::MENU:
-			menu.Render();
 			menu.Update();
 
 			if (menu.ShouldGameStart()) {
 				currentState = WindowState::GAME;
 			}
+			break;
+		}
+
+		switch (currentState) {
+		case WindowState::GAME:
+			game.Render();
+
+			ui.Render(game.GetBoard().GetPlayer());
+			break;
+		case WindowState::MENU:
+			menu.Render();
+
 			break;
 		}
 		EndDrawing();

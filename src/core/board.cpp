@@ -1,5 +1,5 @@
 #include "board.hpp"
-#include "textureManager.hpp"
+#include "../textureManager.hpp"
 #include <functional>
 #include <memory>
 #include <raylib.h>
@@ -16,7 +16,7 @@ void Board::Init() {
 	board[1][1] = std::make_shared<PlayerCard>();
 }
 
-void Board::Update() {
+void Board::Update(ScreenShake &ss) {
 	float dt = GetFrameTime();
 
 	Vector2 offset{
@@ -39,6 +39,14 @@ void Board::Update() {
 
 			card->SetTargetPos(target);
 			card->UpdateAnimation(dt);
+		}
+	}
+}
+
+void Board::OnActionUpdate(ScreenShake &ss) {
+	for (int y = 0; y < boardY; y++) {
+		for (int x = 0; x < boardX; x++) {
+			board[y][x]->AutoAction(*GetPlayer());
 		}
 	}
 }

@@ -1,9 +1,20 @@
 #include "game.hpp"
 #include <algorithm>
+#include <iostream>
 #include <memory>
 #include <raylib.h>
+#include <raymath.h>
 
 void Game::Init() {
+	TraceLog(LOG_WARNING, "GAME INIT START");
+
+	TraceLog(LOG_WARNING, "WORKING DIR: %s", GetWorkingDirectory());
+
+	TraceLog(LOG_WARNING, "KNIGHT EXISTS: %d",
+			 FileExists("assets/knight0.png"));
+
+	TraceLog(LOG_WARNING, "TEXTURES LOADED");
+
 	textureManager.loadAll();
 
 	board.Init();
@@ -14,12 +25,42 @@ void Game::Init() {
 	spellsButton.text = "SPELLS";
 }
 
+int Game::InterpreateGesture() {
+	Vector2 diff = Vector2Subtract(touchEndPos, touchStartPos);
+
+	if (std::abs(diff.x) > std::abs(diff.y)) {
+		return diff.x > 0 ? GESTURE_SWIPE_RIGHT : GESTURE_SWIPE_LEFT;
+	}
+
+	return diff.y > 0 ? GESTURE_SWIPE_DOWN : GESTURE_SWIPE_UP;
+}
+
 void Game::Update() {
 	lastGesture = currentGesture;
-	currentGesture = GetGestureDetected();
-	touchPosition = GetTouchPosition(0);
+	touchArea = {.x = 0,
+				 .y = 0,
+				 .width = static_cast<float>(GetRenderWidth()),
+				 .height = static_cast<float>(GetRenderHeight())};
 
-	board.Update();
+	board.Update(screenShake);
+	screenShake.update(GetFrameTime());
+
+	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+		touchStartPos = GetMousePosition();
+		std::cout << "1 position registered\n";
+	}
+
+	if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+		touchEndPos = GetMousePosition();
+		currentGesture = InterpreateGesture();
+		lastGesture = -1;
+		std::cout << "3 position interpreted\n";
+	}
+
+	if (wasActionTaken) {
+		board.OnActionUpdate(screenShake);
+		wasActionTaken = false;
+	}
 
 	int btnWidth = 100;
 	int btnHeight = 50;
@@ -35,44 +76,30 @@ void Game::Update() {
 	}
 
 	if (IsKeyPressed(KEY_M)) {
-		board.GetPlayer()->spells.push_back(std::make_shared<HealSpell>());
-		board.GetPlayer()->spells.push_back(std::make_shared<DamageSpell>());
+		screenShake.trigger();
 	}
 
 	switch (currentState) {
 	case GameState::BOARD:
-
-		if (IsKeyPressed(KEY_DOWN)) {
-			board.HandleSwipeDown();
-		}
-
-		if (IsKeyPressed(KEY_UP)) {
-			board.HandleSwipeUp();
-		}
-
-		if (IsKeyPressed(KEY_LEFT)) {
-			board.HandleSwipeLeft();
-		}
-
-		if (IsKeyPressed(KEY_RIGHT)) {
-			board.HandleSwipeRight();
-		}
-
-		if (CheckCollisionPointRec(touchPosition, touchArea) &&
+		if (CheckCollisionPointRec(touchStartPos, touchArea) &&
 			(currentGesture != GESTURE_NONE)) {
 			if (currentGesture != lastGesture) {
 				switch (currentGesture) {
 				case GESTURE_SWIPE_DOWN:
 					board.HandleSwipeDown();
+					wasActionTaken = true;
 					break;
 				case GESTURE_SWIPE_UP:
 					board.HandleSwipeUp();
+					wasActionTaken = true;
 					break;
 				case GESTURE_SWIPE_LEFT:
 					board.HandleSwipeLeft();
+					wasActionTaken = true;
 					break;
 				case GESTURE_SWIPE_RIGHT:
 					board.HandleSwipeRight();
+					wasActionTaken = true;
 					break;
 				}
 			}
@@ -114,17 +141,20 @@ void Game::Update() {
 		}
 		break;
 	}
-
-	if (board.GetPlayer()->hp <= 0) {
-		RenderLose();
-	}
 }
 
 void Game::Render() {
+	Camera2D camera = {{0, 0}, {0, 0}, 0.0f, 1.0f};
+
+	camera.offset = screenShake.offset;
+	BeginMode2D(camera);
+
 	board.Render(textureManager);
 
 	if (currentState == GameState::SPELLS)
 		spellPage.Render(*board.GetPlayer());
+
+	EndMode2D();
 
 	spellsButton.Draw(GetFontDefault());
 
@@ -132,6 +162,10 @@ void Game::Render() {
 		DrawText(selectedSpell->name.c_str(), 100, 300, 30, GREEN);
 	else
 		DrawText("SPELL NOT SELECTED", 100, 300, 30, GREEN);
+
+	if (board.GetPlayer()->hp <= 0) {
+		RenderLose();
+	}
 }
 
 void Game::RenderLose() {

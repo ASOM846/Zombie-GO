@@ -2,10 +2,11 @@
 
 #include <raylib.h>
 
+#include "../graphics/screenShake.hpp"
+#include "../textureManager.hpp"
 #include "board.hpp"
 #include "button.hpp"
 #include "spellPage.hpp"
-#include "textureManager.hpp"
 
 enum class GameState {
 	BOARD,
@@ -17,14 +18,18 @@ class Game {
   public:
 	void Init();
 
+	int InterpreateGesture();
+
 	void Update();
 	void Render();
 
 	Board &GetBoard() { return board; };
 
-	Vector2 touchPosition{0, 0};
-	int currentGesture{GESTURE_NONE};
-	int lastGesture{GESTURE_NONE};
+	TextureManager *GetTextureManager() { return &textureManager; }
+
+	Vector2 touchStartPos;
+	Vector2 touchEndPos;
+
 	Rectangle touchArea{0, 0, 1920, 1080};
 
   private:
@@ -37,7 +42,13 @@ class Game {
 	SpellPage spellPage;
 	Button spellsButton;
 
+	int currentGesture;
+	int lastGesture;
+
 	std::shared_ptr<Spell> selectedSpell{nullptr};
 
+	bool wasActionTaken;
+
 	TextureManager textureManager;
+	ScreenShake screenShake;
 };

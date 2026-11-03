@@ -5,13 +5,15 @@
 #include <vector>
 
 #include "../entity/card.hpp"
-#include "textureManager.hpp"
+#include "../graphics/screenShake.hpp"
+#include "../textureManager.hpp"
 
 class Board {
   public:
 	void Init();
 
-	void Update();
+	void Update(ScreenShake &ss);
+	void OnActionUpdate(ScreenShake &ss);
 	void Render(TextureManager &tm);
 
 	void HandleSwipeDown();

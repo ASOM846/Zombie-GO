@@ -8,11 +8,17 @@
 enum class TextureId {
 	KNIGHT,
 
+	BCG_0,
+
+	VIGNETTE_0,
+
 	TRAP_0,
 
 	CHEST_0,
 
 	CRATE_0,
+
+	COIN_0,
 
 	FLASK_0,
 	FLASK_1,
@@ -48,13 +54,20 @@ class TextureManager {
 	}
 
 	void loadAll() {
+
 		load(TextureId::KNIGHT, "assets/knight.png");
+
+		load(TextureId::BCG_0, "assets/bcg0.png");
+
+		load(TextureId::VIGNETTE_0, "assets/vignette0.png");
 
 		load(TextureId::TRAP_0, "assets/trap0.png");
 
 		load(TextureId::CHEST_0, "assets/chest0.png");
 
 		load(TextureId::CRATE_0, "assets/crate0.png");
+
+		load(TextureId::COIN_0, "assets/coin0.png");
 
 		load(TextureId::FLASK_0, "assets/flask0.png");
 		load(TextureId::FLASK_1, "assets/flask1.png");
@@ -77,10 +90,21 @@ class TextureManager {
 	}
 
 	void load(TextureId id, const char *path) {
+		TraceLog(LOG_INFO, "[TEXTURE] Loading: %s", path);
+
+		TraceLog(LOG_INFO, "Working directory: %s", GetWorkingDirectory());
+		TraceLog(LOG_INFO, "Asset exists: %s", FileExists(path) ? "YES" : "NO");
+
 		Texture2D tex = LoadTexture(path);
+
 		if (tex.id == 0) {
+			TraceLog(LOG_ERROR, "[TEXTURE] FAILED: %s", path);
+
 			throw std::runtime_error(std::string("Unable to load: ") + path);
 		}
+
+		TraceLog(LOG_INFO, "[TEXTURE] SUCCESS: %s", path);
+
 		textures.emplace(id, tex);
 	}
 
