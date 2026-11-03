@@ -25,6 +25,8 @@ class Board {
 
 	std::shared_ptr<Card> GetCellAtPosition(Vector2 posistion);
 
+	void RecalculateDrawindVariables();
+
   private:
 	void RenderCell();
 
@@ -37,8 +39,13 @@ class Board {
 	const int boardY = 3;
 	const int boardX = 3;
 
-	int cellHeight = 266;
-	int cellWidth = 200;
+	int cellHeight; //= 266; proportions are 1/3 : 1
+	int cellWidth;	//=200;
+
+	int maxCellWidth;
 
 	const int spacing = 30;
+
+	Vector2 minOffset{0, 200};
+	Vector2 boardOffset{};
 };

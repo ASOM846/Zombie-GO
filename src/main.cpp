@@ -20,8 +20,8 @@ void DrawBackground(const Texture2D &tex) {
 }
 
 int main() {
-	int screenWidth = 0;
-	int screenHeight = 0;
+	int screenHeight = 1080; // static_cast<int>(screenWidth * 19.5f / 9.0f);
+	int screenWidth = static_cast<int>(screenHeight * 9.0f / 19.5f);
 
 	// #if defined(__ANDROID__)
 	// 	width = height = 0;

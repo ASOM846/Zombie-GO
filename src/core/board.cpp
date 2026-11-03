@@ -19,13 +19,7 @@ void Board::Init() {
 void Board::Update(ScreenShake &ss) {
 	float dt = GetFrameTime();
 
-	Vector2 offset{
-		static_cast<float>(
-			(GetScreenWidth() - (cellWidth * boardX + spacing * (boardX - 1))) /
-			2),
-		static_cast<float>((GetScreenHeight() -
-							(cellHeight * boardY + spacing * (boardY - 1))) /
-						   2)};
+	RecalculateDrawindVariables();
 
 	Vector2 cellSize = {static_cast<float>(cellWidth),
 						static_cast<float>(cellHeight)};
@@ -34,8 +28,8 @@ void Board::Update(ScreenShake &ss) {
 		for (int x = 0; x < boardX; x++) {
 			auto &card = board[y][x];
 
-			Vector2 target{offset.x + (cellWidth + spacing) * x,
-						   offset.y + (cellHeight + spacing) * y};
+			Vector2 target{boardOffset.x + (cellWidth + spacing) * x,
+						   boardOffset.y + (cellHeight + spacing) * y};
 
 			card->SetTargetPos(target);
 			card->UpdateAnimation(dt);
@@ -290,4 +284,34 @@ std::shared_ptr<Card> Board::GetRandomCard() {
 	}
 
 	return std::make_shared<EnemyCard>();
+}
+
+void Board::RecalculateDrawindVariables() {
+	int screenWidth = GetScreenWidth();
+	int screenHeight = GetScreenHeight();
+
+	int virtualScreenWidth = screenWidth - minOffset.x;
+	int virtualScreenHeight = screenHeight - minOffset.y;
+
+	int maxCellWidth = (virtualScreenWidth - (spacing * boardX + 1)) / boardX;
+	int maxCellHeight;
+
+	cellWidth = maxCellWidth;
+	cellHeight = maxCellWidth * 1.333333;
+
+	if ((cellHeight * boardY + (boardY + 1) * spacing) >= virtualScreenHeight) {
+		maxCellHeight = (virtualScreenHeight - (spacing * boardY + 1)) / boardY;
+
+		cellWidth = maxCellHeight * 0.755555;
+		cellHeight = maxCellHeight;
+	}
+
+	boardOffset = {.x = static_cast<float>(
+					   (virtualScreenWidth -
+						(cellWidth * boardX + spacing * (boardX - 1))) /
+					   2),
+				   .y = static_cast<float>(
+					   (virtualScreenHeight + minOffset.y / 2 -
+						(cellHeight * boardY + spacing * (boardY - 1))) /
+					   2)};
 }
