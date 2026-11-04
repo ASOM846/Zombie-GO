@@ -6,19 +6,21 @@
 #include "../textureManager.hpp"
 #include "board.hpp"
 #include "button.hpp"
+#include "gestureInput.hpp"
 #include "spellPage.hpp"
 
 enum class GameState {
 	BOARD,
 	SPELLS,
 	TARGETTING,
+
+	RETURN_TO_MENU,
 };
 
 class Game {
   public:
 	void Init();
-
-	int InterpreateGesture();
+	void Reset();
 
 	void Update();
 	void Render();
@@ -27,8 +29,7 @@ class Game {
 
 	TextureManager *GetTextureManager() { return &textureManager; }
 
-	Vector2 touchStartPos;
-	Vector2 touchEndPos;
+	GameState &GetCurrentState() { return currentState; }
 
   private:
 	void RenderLose();
@@ -37,12 +38,12 @@ class Game {
 
 	Board board;
 
+	GestureInput gestureInput;
+
 	SpellPage spellPage;
 
 	Button spellsButton;
-
-	int currentGesture;
-	int lastGesture;
+	Button goBackButton;
 
 	std::shared_ptr<Spell> selectedSpell{nullptr};
 

@@ -1,6 +1,5 @@
 #include "game.hpp"
 #include <algorithm>
-#include <iostream>
 #include <memory>
 #include <raylib.h>
 #include <raymath.h>
@@ -14,40 +13,25 @@ void Game::Init() {
 	currentState = GameState::BOARD;
 
 	spellsButton.text = "SPELLS";
+	goBackButton.text = "<";
 
 	UpdateButtonPos();
 }
 
-int Game::InterpreateGesture() {
-	Vector2 diff = Vector2Subtract(touchEndPos, touchStartPos);
-
-	if (Vector2Distance(touchStartPos, touchEndPos) <= 50)
-		return GESTURE_NONE;
-
-	if (std::abs(diff.x) > std::abs(diff.y)) {
-		return diff.x > 0 ? GESTURE_SWIPE_RIGHT : GESTURE_SWIPE_LEFT;
-	}
-
-	return diff.y > 0 ? GESTURE_SWIPE_DOWN : GESTURE_SWIPE_UP;
+void Game::Reset() {
+	currentState = GameState::BOARD;
+	spellPage.Reset();
+	board.Reset();
 }
 
 void Game::Update() {
-	lastGesture = currentGesture;
-
 	board.Update(screenShake);
+	board.UpdateHighlights(selectedSpell);
 	screenShake.update(GetFrameTime());
 
+	gestureInput.Update();
+
 	UpdateButtonPos();
-
-	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-		touchStartPos = GetMousePosition();
-	}
-
-	if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-		touchEndPos = GetMousePosition();
-		currentGesture = InterpreateGesture();
-		lastGesture = -1;
-	}
 
 	if (wasActionTaken) {
 		board.OnActionUpdate(screenShake);
@@ -59,14 +43,21 @@ void Game::Update() {
 										  : currentState = GameState::SPELLS;
 	}
 
+	if (goBackButton.IsClicked(GetMousePosition())) {
+		currentState = GameState::RETURN_TO_MENU;
+	}
+
 	spellsButton.Update(GetMousePosition());
+	goBackButton.Update(GetMousePosition());
 
 	switch (currentState) {
 	case GameState::BOARD:
-		if (CheckCollisionPointRec(touchStartPos, board.GetTouchRec()) &&
-			(currentGesture != GESTURE_NONE)) {
-			if (currentGesture != lastGesture) {
-				switch (currentGesture) {
+		if (CheckCollisionPointRec(gestureInput.GetTouchPointStart(),
+								   board.GetTouchRec()) &&
+			(gestureInput.GetGestureRecorded() != GESTURE_NONE)) {
+			if (gestureInput.GetGestureRecorded() !=
+				gestureInput.GetLastGestureRecorded()) {
+				switch (gestureInput.GetGestureRecorded()) {
 				case GESTURE_SWIPE_DOWN:
 					board.HandleSwipeDown();
 					wasActionTaken = true;
@@ -83,6 +74,8 @@ void Game::Update() {
 					board.HandleSwipeRight();
 					wasActionTaken = true;
 					break;
+				default:
+					break;
 				}
 				screenShake.trigger();
 			}
@@ -92,8 +85,9 @@ void Game::Update() {
 	case GameState::SPELLS:
 		selectedSpell = spellPage.UpdateAndGetSelected(*board.GetPlayer());
 
-		if (selectedSpell != nullptr)
+		if (selectedSpell != nullptr) {
 			currentState = GameState::TARGETTING;
+		}
 
 		break;
 	case GameState::TARGETTING:
@@ -123,28 +117,33 @@ void Game::Update() {
 			}
 		}
 		break;
+	case GameState::RETURN_TO_MENU:
+		break;
 	}
 }
 
 void Game::Render() {
-	Camera2D camera = {{0, 0}, {0, 0}, 0.0f, 1.0f};
+	Camera2D camera = {{0, 0}, {0, 0}, 0.0F, 1.0F};
 
 	camera.offset = screenShake.offset;
 	BeginMode2D(camera);
 
 	board.Render(textureManager);
 
-	if (currentState == GameState::SPELLS)
+	if (currentState == GameState::SPELLS) {
 		spellPage.Render(*board.GetPlayer());
+	}
 
 	EndMode2D();
 
 	spellsButton.Draw(GetFontDefault());
+	goBackButton.Draw(GetFontDefault());
 
-	if (selectedSpell)
+	if (selectedSpell) {
 		DrawText(selectedSpell->name.c_str(), 100, 300, 30, GREEN);
-	else
+	} else {
 		DrawText("SPELL NOT SELECTED", 100, 300, 30, GREEN);
+	}
 
 	if (board.GetPlayer()->hp <= 0) {
 		RenderLose();
@@ -152,8 +151,8 @@ void Game::Render() {
 }
 
 void Game::RenderLose() {
-	float rectangleHeight{100};
-	Vector2 recPos{0, {(GetScreenHeight() - rectangleHeight) / 2}};
+	const float rectangleHeight{100};
+	Vector2 recPos{0, (GetScreenHeight() - rectangleHeight) / 2};
 
 	DrawRectangleV(recPos,
 				   {static_cast<float>(GetScreenWidth()), rectangleHeight},
@@ -175,11 +174,18 @@ void Game::RenderLose() {
 }
 
 void Game::UpdateButtonPos() {
-	int btnWidth = 100;
+	int btnWidth = board.GetCellWidth();
 	int btnHeight = 50;
 
 	spellsButton.rect = {
 		.x = static_cast<float>(GetScreenWidth() / 2 - btnWidth / 2),
+		.y = static_cast<float>(GetScreenHeight() - 40 - btnHeight),
+		.width = static_cast<float>(btnWidth),
+		.height = static_cast<float>(btnHeight)};
+
+	goBackButton.rect = {
+		.x = static_cast<float>(GetScreenWidth() / 2 - btnWidth - btnWidth / 2 -
+								board.GetSpacing()),
 		.y = static_cast<float>(GetScreenHeight() - 40 - btnHeight),
 		.width = static_cast<float>(btnWidth),
 		.height = static_cast<float>(btnHeight)};

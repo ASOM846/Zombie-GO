@@ -1,0 +1,47 @@
+#include "playerCard.hpp"
+
+PlayerCard::PlayerCard() {
+	name = "PLAYER";
+
+	currentWeapon = std::make_shared<SwordCard>();
+	currentWeapon->name = "SWORD";
+	currentWeapon->attack = 5;
+
+	maxHp = 12;
+
+	hp = maxHp;
+	coins = 0;
+
+	textureId = TextureId::KNIGHT;
+}
+
+void PlayerCard::RenderContent(Vector2 offset, Vector2 cellSize,
+							   TextureManager &tm) {
+
+	if (currentWeapon) {
+		float centerX = offset.x + cellSize.x / 2.0f;
+		float centerY = offset.y + cellSize.y / 2.0f;
+
+		const Texture2D &texture = tm.get(currentWeapon->textureId);
+
+		float scale = 3.0F;
+
+		float drawX = centerX - (texture.width * scale) / 2.0f - cellSize.x / 4;
+		float drawY = centerY - (texture.height * scale) / 2.0f;
+
+		DrawTextureEx(texture, {drawX, drawY - 5 * scale}, 0.0f, scale,
+					  RAYWHITE);
+	}
+}
+
+std::string PlayerCard::GetValueText() const {
+	if (currentWeapon)
+		return std::string{std::to_string(hp) + "/" + std::to_string(maxHp) +
+						   "  |  " + std::to_string(currentWeapon->attack)};
+
+	return std::string{std::to_string(hp) + "/" + std::to_string(maxHp)};
+}
+
+bool PlayerCard::Interact(PlayerCard &player) {
+	return true;
+}

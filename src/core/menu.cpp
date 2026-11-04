@@ -9,6 +9,10 @@ void Menu::Init() {
 	InitButtonsPositions();
 }
 
+void Menu::Reset() {
+	shouldGameStart - false;
+}
+
 void Menu::Update() {
 	InitButtonsPositions();
 	shouldGameStart = false;

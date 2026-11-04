@@ -1,0 +1,58 @@
+#include "enemyCard.hpp"
+#include "playerCard.hpp"
+#include "weaponCard.hpp"
+#include <vector>
+
+EnemyCard::EnemyCard() {
+	hp = GetRandomValue(1, 6);
+	name = "ENEMY";
+
+	auto GetRandomTexture = []() {
+		std::vector<TextureId> textures{TextureId::ENEMY_0, TextureId::ENEMY_1,
+										TextureId::ENEMY_2, TextureId::ENEMY_3,
+										TextureId::ENEMY_4, TextureId::ENEMY_5};
+
+		int seed = GetRandomValue(0, textures.size() - 1);
+
+		return textures[seed];
+	};
+
+	textureId = GetRandomTexture();
+}
+
+void EnemyCard::RenderContent(Vector2 offset, Vector2 cellSize,
+							  TextureManager &tm) {}
+
+std::string EnemyCard::GetValueText() const {
+	return std::to_string(hp);
+}
+
+bool EnemyCard::Interact(PlayerCard &player) {
+	int playerDmg = 0;
+
+	if (player.currentWeapon && player.currentWeapon->attack > 0) {
+		playerDmg = player.currentWeapon->attack;
+
+		player.currentWeapon->attack -= hp;
+		hp -= playerDmg;
+
+		if (player.currentWeapon->attack <= 0) {
+			player.currentWeapon->attack = 0;
+			player.currentWeapon.reset();
+		}
+	} else {
+		playerDmg = player.hp;
+
+		player.hp -= hp;
+		hp -= playerDmg;
+
+		if (player.hp < 0)
+			player.hp = 0;
+	}
+
+	if (hp > 0) {
+		return false;
+	}
+
+	return true;
+}

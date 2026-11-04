@@ -2,7 +2,10 @@
 #include <memory>
 #include <raylib.h>
 
+#include "../card/activeEnemyCard.hpp"
 #include "../card/card.hpp"
+#include "../card/enemyCard.hpp"
+#include "../card/playerCard.hpp"
 
 void Spell::Render(Vector2 position, Vector2 size) {
 	float centerX = position.x + size.x / 2.0f;
@@ -108,8 +111,6 @@ void Spell::Render(Vector2 position, Vector2 size) {
 }
 
 HealSpell::HealSpell() {
-	manaRequired = 5;
-
 	healAmount = 5;
 	name = "HEAL 5";
 }
@@ -133,9 +134,19 @@ bool HealSpell::Interact(std::shared_ptr<Card> target) {
 	return false;
 }
 
-DamageSpell::DamageSpell() {
-	manaRequired = 5;
+bool HealSpell::ShouldHighlight(std::shared_ptr<Card> &target) {
+	if (auto playerTarget = std::dynamic_pointer_cast<PlayerCard>(target)) {
+		return true;
+	}
 
+	if (auto enemyTarget = std::dynamic_pointer_cast<EnemyCard>(target)) {
+		return true;
+	}
+
+	return false;
+}
+
+DamageSpell::DamageSpell() {
 	damageAmount = 5;
 	name = "DAMAGE 5";
 }
@@ -152,6 +163,27 @@ bool DamageSpell::Interact(std::shared_ptr<Card> target) {
 
 	if (auto enemyTarget = std::dynamic_pointer_cast<EnemyCard>(target)) {
 		enemyTarget->hp -= damageAmount;
+		return true;
+	}
+
+	if (auto enemyTarget = std::dynamic_pointer_cast<ActiveEnemyCard>(target)) {
+		enemyTarget->hp -= damageAmount;
+		return true;
+	}
+
+	return false;
+}
+
+bool DamageSpell::ShouldHighlight(std::shared_ptr<Card> &target) {
+	if (auto playerTarget = std::dynamic_pointer_cast<PlayerCard>(target)) {
+		return true;
+	}
+
+	if (auto enemyTarget = std::dynamic_pointer_cast<EnemyCard>(target)) {
+		return true;
+	}
+
+	if (auto enemyTarget = std::dynamic_pointer_cast<ActiveEnemyCard>(target)) {
 		return true;
 	}
 

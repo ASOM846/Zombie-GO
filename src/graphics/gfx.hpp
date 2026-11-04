@@ -4,8 +4,8 @@
 #include <raylib.h>
 
 namespace gfx {
-void DrawCardBase(float centerX, float centerY, Vector2 position,
-				  Vector2 cellSize, TextureManager &tm, Card &card) {
+inline void DrawCardBase(float centerX, float centerY, Vector2 position,
+						 Vector2 cellSize, TextureManager &tm, Card &card) {
 
 	const float s = card.scale;
 
@@ -46,6 +46,9 @@ void DrawCardBase(float centerX, float centerY, Vector2 position,
 
 	drawRect(position.x + 4, position.y + 4, width, height, shadow);
 	drawRect(position.x, position.y, width, height, darkWood);
+
+	if (card.isHighlited)
+		drawRect(position.x, position.y, width, height, GREEN);
 
 	const float border = 6;
 
@@ -155,8 +158,8 @@ void DrawCardBase(float centerX, float centerY, Vector2 position,
 	DrawTextureEx(texture, texturePos, 0.0f, textureScale * s, RAYWHITE);
 }
 
-void DrawButton(const Rectangle &dst, const char *text, float shadowOffset,
-				const Font &font) {
+inline void DrawButton(const Rectangle &dst, const char *text,
+					   float shadowOffset, const Font &font) {
 	const auto shadow = Color{0, 0, 0, 100};
 	const auto darkWood = Color{60, 30, 15, 255};
 	const auto parchment = Color{220, 200, 170, 255};

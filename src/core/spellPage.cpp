@@ -1,12 +1,12 @@
 #include "spellPage.hpp"
+#include "../entity/card/playerCard.hpp"
 #include <raylib.h>
 
 void SpellPage::Init() {
-	// spells.push_back(std::make_shared<HealSpell>());
-	// spells.push_back(std::make_shared<DamageSpell>());
-	//
 	UpdatePosition();
 }
+
+void SpellPage::Reset() {}
 
 std::shared_ptr<Spell> SpellPage::UpdateAndGetSelected(PlayerCard &player) {
 	UpdatePosition();

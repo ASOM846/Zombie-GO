@@ -18,9 +18,8 @@ class Spell {
 
   public:
 	virtual bool Interact(std::shared_ptr<Card> target) = 0;
+	virtual bool ShouldHighlight(std::shared_ptr<Card> &target) = 0;
 	std::string name;
-
-	int manaRequired;
 };
 
 class HealSpell : public Spell {
@@ -31,6 +30,7 @@ class HealSpell : public Spell {
 	void RenderContent(Vector2 offset, Vector2 size) override;
 
 	bool Interact(std::shared_ptr<Card> target) override;
+	bool ShouldHighlight(std::shared_ptr<Card> &target) override;
 
 	int healAmount;
 };
@@ -43,6 +43,7 @@ class DamageSpell : public Spell {
 	void RenderContent(Vector2 offset, Vector2 size) override;
 
 	bool Interact(std::shared_ptr<Card> target) override;
+	bool ShouldHighlight(std::shared_ptr<Card> &target) override;
 
 	int damageAmount;
 };

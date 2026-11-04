@@ -19,6 +19,8 @@ void DrawBackground(const Texture2D &tex) {
 	DrawTexturePro(tex, src, dst, {0, 0}, 0.0f, WHITE);
 }
 
+void SwitchState(WindowState &currentState, WindowState newState) {}
+
 int main() {
 	int screenHeight = 1080; // static_cast<int>(screenWidth * 19.5f / 9.0f);
 	int screenWidth = static_cast<int>(screenHeight * 9.0f / 19.5f);
@@ -52,15 +54,35 @@ int main() {
 		DrawBackground(game.GetTextureManager()->get(TextureId::BCG_0));
 		DrawBackground(game.GetTextureManager()->get(TextureId::VIGNETTE_0));
 
+		auto switchState = [&currentState, &game, &menu](WindowState newState) {
+			if (currentState == newState) {
+				return;
+			}
+
+			switch (newState) {
+			case WindowState::GAME:
+				game.Reset();
+				break;
+			case WindowState::MENU:
+				menu.Reset();
+				break;
+			}
+
+			currentState = newState;
+		};
+
 		switch (currentState) {
 		case WindowState::GAME:
 			game.Update();
+			if (game.GetCurrentState() == GameState::RETURN_TO_MENU) {
+				switchState(WindowState::MENU);
+			}
 			break;
 		case WindowState::MENU:
 			menu.Update();
 
 			if (menu.ShouldGameStart()) {
-				currentState = WindowState::GAME;
+				switchState(WindowState::GAME);
 			}
 			break;
 		}

@@ -1,12 +1,26 @@
 #include "board.hpp"
+#include "../entity/card/activeEnemyCard.hpp"
+#include "../entity/card/chestCard.hpp"
+#include "../entity/card/coinCard.hpp"
+#include "../entity/card/enemyCard.hpp"
+#include "../entity/card/healthPotionCard.hpp"
+#include "../entity/card/playerCard.hpp"
+#include "../entity/card/spellRecepieCard.hpp"
+#include "../entity/card/trapCard.hpp"
+#include "../entity/card/weaponCard.hpp"
+#include "../entity/spell/spell.hpp"
 #include "../textureManager.hpp"
+
 #include <functional>
 #include <memory>
 #include <raylib.h>
 
 void Board::Init() {
 	board.resize(boardY, std::vector<std::shared_ptr<Card>>(boardX));
+	Reset();
+}
 
+void Board::Reset() {
 	for (int y = 0; y < boardY; y++) {
 		for (int x = 0; x < boardX; x++) {
 			board[y][x] = GetRandomCard();
@@ -41,6 +55,23 @@ void Board::OnActionUpdate(ScreenShake &ss) {
 	for (int y = 0; y < boardY; y++) {
 		for (int x = 0; x < boardX; x++) {
 			board[y][x]->AutoAction(*GetPlayer());
+		}
+	}
+}
+
+void Board::UpdateHighlights(std::shared_ptr<Spell> selectedSpell) {
+	for (int y = 0; y < boardY; y++) {
+		for (int x = 0; x < boardX; x++) {
+			auto &card = board[y][x];
+			if (card == nullptr) {
+				continue;
+			}
+
+			if (selectedSpell != nullptr) {
+				card->isHighlited = selectedSpell->ShouldHighlight(card);
+			} else {
+				card->isHighlited = false;
+			}
 		}
 	}
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../entity/card/card.hpp"
+#include "../entity/card/playerCard.hpp"
 #include <raylib.h>
 
 class Ui {
