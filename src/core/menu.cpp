@@ -10,7 +10,7 @@ void Menu::Init() {
 }
 
 void Menu::Reset() {
-	shouldGameStart - false;
+	shouldGameStart = false;
 }
 
 void Menu::Update() {

@@ -3,7 +3,12 @@
 #include "../entity/card/card.hpp"
 #include <raylib.h>
 
+#include <algorithm>
+#include <string>
+
 namespace gfx {
+inline float userScale = 1.0f;
+
 inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 						 Vector2 cellSize, TextureManager &tm, Card &card) {
 
@@ -33,81 +38,42 @@ inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 		DrawCircleV(p, radius * s, color);
 	};
 
-	int radius = cellSize.x / 2 * card.scale;
-	int size = radius * 2;
+	// Background – główne tło gry
+	const Color background = {32, 36, 38, 255};
 
-	const auto shadow = Color{0, 0, 0, 100};
-	const auto darkWood = Color{60, 30, 15, 255};
-	const auto parchment = Color{220, 200, 170, 255};
-	const auto goldAccent = Color{180, 130, 40, 255};
+	// Panel – karty, przyciski, panele UI
+	const Color panel = {56, 62, 64, 255};
+
+	// Border – ramki, separatory
+	const Color border = {91, 98, 99, 255};
+
+	// Primary Text – nazwy, nagłówki
+	const Color textColor = {210, 212, 208, 255};
+
+	// Secondary Text – opisy, mniej ważne informacje
+	const Color secondaryText = {165, 170, 170, 255};
+
+	// Shadow – cienie pod kartami i przyciskami
+	const Color shadow = {0, 0, 0, 120};
 
 	const float width = cellSize.x;
 	const float height = cellSize.y;
 
-	drawRect(position.x + 4, position.y + 4, width, height, shadow);
-	drawRect(position.x, position.y, width, height, darkWood);
+	// Card shadow
+	drawRect(position.x + 5, position.y + 6, width, height, shadow);
 
-	if (card.isHighlited)
-		drawRect(position.x, position.y, width, height, GREEN);
+	// card border
+	drawRect(position.x, position.y, width, height, border);
 
-	const float border = 6;
+	// Main metal surface
+	drawRect(position.x + 3, position.y + 3, width - 6, height - 6, panel);
 
-	drawRect(position.x + border, position.y + border, width - 2 * border,
-			 height - 2 * border, parchment);
+	// Highlighted card
+	if (card.isHighlited) {
+		drawRect(position.x, position.y, width, height, {105, 130, 65, 180});
+	}
 
-	Vector2 gradTL = transform(position.x + border, position.y + border);
-	Vector2 gradTR =
-		transform(position.x + width - border, position.y + border);
-	Vector2 gradBR =
-		transform(position.x + width - border, position.y + height - border);
-	Vector2 gradBL =
-		transform(position.x + border, position.y + height - border);
-
-	Color topColor = card.gradientColor;
-	// Color bottomColor = {card.gradientColor.r, card.gradientColor.g,
-	// 					 card.gradientColor.b, 0};
-	auto bottomColor = BLANK;
-
-	DrawRectangleGradientEx({gradTL.x, gradTL.y, (width - 2 * border) * s,
-							 (height - 2 * border) * s},
-							topColor, bottomColor, topColor, bottomColor);
-
-	const float innerMargin = border + 4;
-
-	DrawRectangleLinesEx(
-		{transform(position.x + innerMargin, position.y + innerMargin).x,
-		 transform(position.x + innerMargin, position.y + innerMargin).y,
-		 (width - 2 * innerMargin) * s, (height - 2 * innerMargin) * s},
-		2 * s, goldAccent);
-
-	const float cornerLen = 16.0f;
-	const float thick = 4.0f;
-	const float p = innerMargin;
-
-	Vector2 tl = {position.x + p, position.y + p};
-	Vector2 tr = {position.x + width - p, position.y + p};
-	Vector2 bl = {position.x + p, position.y + height - p};
-	Vector2 br = {position.x + width - p, position.y + height - p};
-
-	drawLine(tl, {tl.x + cornerLen, tl.y}, thick, goldAccent);
-	drawLine(tl, {tl.x, tl.y + cornerLen}, thick, goldAccent);
-
-	drawLine(tr, {tr.x - cornerLen, tr.y}, thick, goldAccent);
-	drawLine(tr, {tr.x, tr.y + cornerLen}, thick, goldAccent);
-
-	drawLine(bl, {bl.x + cornerLen, bl.y}, thick, goldAccent);
-	drawLine(bl, {bl.x, bl.y - cornerLen}, thick, goldAccent);
-
-	drawLine(br, {br.x - cornerLen, br.y}, thick, goldAccent);
-	drawLine(br, {br.x, br.y - cornerLen}, thick, goldAccent);
-
-	const float niteRadius = 3;
-
-	drawCircle(tl.x, tl.y, niteRadius, darkWood);
-	drawCircle(tr.x, tr.y, niteRadius, darkWood);
-	drawCircle(bl.x, bl.y, niteRadius, darkWood);
-	drawCircle(br.x, br.y, niteRadius, darkWood);
-
+	// Card name
 	const int fontSize = 20;
 	const char *text = card.name.c_str();
 
@@ -115,108 +81,158 @@ inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 
 	Vector2 namePos = transform(centerX - textWidth / 2.0f, position.y + 16);
 
+	// Dark text shadow
+	DrawText(text, static_cast<int>(namePos.x + 1),
+			 static_cast<int>(namePos.y + 2),
+			 std::max(1, static_cast<int>(fontSize * s)), shadow);
+
 	DrawText(text, static_cast<int>(namePos.x), static_cast<int>(namePos.y),
-			 std::max(1, static_cast<int>(fontSize * s)), {40, 20, 10, 255});
+			 std::max(1, static_cast<int>(fontSize * s)), textColor);
 
-	const float sepY = position.y + 42;
+	// Top separator
+	const float topSepY = position.y + 42;
 
-	drawLine({position.x + 14, sepY}, {position.x + width - 14, sepY}, 2,
-			 goldAccent);
+	drawLine({position.x + 14, topSepY}, {position.x + width - 14, topSepY}, 2,
+			 RED);
 
-	drawCircle(position.x + 14, sepY, 2, darkWood);
-	drawCircle(position.x + width - 14, sepY, 2, darkWood);
+	// Bottom separator
+	const float bottomSepY = position.y + height - 46;
 
-	const float sepYBottom = position.y + height - 46;
+	drawLine({position.x + 14, bottomSepY},
+			 {position.x + width - 14, bottomSepY}, 2, RED);
 
-	drawLine({position.x + 14, sepYBottom},
-			 {position.x + width - 14, sepYBottom}, 2, goldAccent);
-
-	drawCircle(position.x + 14, sepYBottom, 2, darkWood);
-	drawCircle(position.x + width - 14, sepYBottom, 2, darkWood);
-
+	// Card value
 	std::string valueStr = card.GetValueText();
 
 	const int valueFontSize = 24;
 	const int valueWidth = MeasureText(valueStr.c_str(), valueFontSize);
 
-	Vector2 valuePos = transform(centerX - valueWidth / 2.0f, sepYBottom + 8);
+	Vector2 valuePos = transform(centerX - valueWidth / 2.0f, bottomSepY + 8);
 
 	DrawText(valueStr.c_str(), static_cast<int>(valuePos.x),
 			 static_cast<int>(valuePos.y),
-			 std::max(1, static_cast<int>(valueFontSize * s)),
-			 {50, 30, 20, 255});
+			 std::max(1, static_cast<int>(valueFontSize * s)), textColor);
 
+	// Card artwork – dopasowanie tekstury z zachowaniem proporcji
 	const Texture2D &texture = tm.get(card.textureId);
-	const float textureScale = 3.0f;
 
-	float drawX = centerX - (texture.width * textureScale) / 2.0f;
-	float drawY =
-		centerY - (texture.height * textureScale) / 2.0f - (5 * textureScale);
+	const float texturePadding = 12.0f;
 
-	Vector2 texturePos = transform(drawX, drawY);
+	const float availableWidth = width - texturePadding * 2.0f;
+	const float availableHeight = bottomSepY - topSepY - 16.0f;
 
-	DrawTextureEx(texture, texturePos, 0.0f, textureScale * s, RAYWHITE);
+	// Skala dopasowująca teksturę do dostępnego obszaru
+	const float scaleX = availableWidth / texture.width;
+	const float scaleY = availableHeight / texture.height;
+	const float textureScale = std::min(scaleX, scaleY);
+
+	// Końcowe wymiary tekstury
+	const float drawWidth = texture.width * textureScale;
+	const float drawHeight = texture.height * textureScale;
+
+	// Wyśrodkowanie tekstury między separatorami
+	const float drawX = centerX - drawWidth / 2.0f;
+	const float drawY = topSepY + 8.0f + (availableHeight - drawHeight) / 2.0f;
+
+	Rectangle source = {0.0f, 0.0f, static_cast<float>(texture.width),
+						static_cast<float>(texture.height)};
+
+	Rectangle dest = {transform(drawX, drawY).x, transform(drawX, drawY).y,
+					  drawWidth * s, drawHeight * s};
+
+	DrawTexturePro(texture, source, dest, {0.0f, 0.0f}, 0.0f, RAYWHITE);
 }
 
 inline void DrawButton(const Rectangle &dst, const char *text,
 					   float shadowOffset, const Font &font) {
-	const auto shadow = Color{0, 0, 0, 100};
-	const auto darkWood = Color{60, 30, 15, 255};
-	const auto parchment = Color{220, 200, 170, 255};
-	const auto goldAccent = Color{180, 130, 40, 255};
 
+	const Color shadow = {0, 0, 0, 180};
+	const Color darkMetal = {23, 29, 26, 255};
+	const Color metal = {48, 55, 48, 255};
+	const Color dirtyPaper = {173, 166, 132, 255};
+	const Color rust = {125, 65, 35, 255};
+	const Color warning = {190, 153, 55, 255};
+	const Color textColor = {29, 32, 25, 255};
+
+	// Shadow
 	DrawRectangle(dst.x + shadowOffset, dst.y + shadowOffset, dst.width,
 				  dst.height, shadow);
-	DrawRectangle(dst.x, dst.y, dst.width, dst.height, darkWood);
 
-	const float border = 6;
-	DrawRectangle(dst.x + border, dst.y + border, dst.width - (2 * border),
-				  dst.height - (2 * border), parchment);
+	// Outer casing
+	DrawRectangle(dst.x, dst.y, dst.width, dst.height, darkMetal);
 
-	int innerMargin = border + 4;
-	DrawRectangleLinesEx({dst.x + static_cast<float>(innerMargin),
-						  dst.y + static_cast<float>(innerMargin),
-						  static_cast<float>(dst.width - (2 * innerMargin)),
-						  static_cast<float>(dst.height - (innerMargin * 2))},
-						 2, goldAccent);
+	// Metal body
+	DrawRectangle(dst.x + 3, dst.y + 3, dst.width - 6, dst.height - 6, metal);
 
-	float cornerLen = 16.0F;
-	float thick = 4.0F;
-	float p = innerMargin;
+	const float border = 8.0f;
+
+	// Inner panel
+	DrawRectangle(dst.x + border, dst.y + border, dst.width - 2 * border,
+				  dst.height - 2 * border, dirtyPaper);
+
+	// Warning stripe
+	DrawRectangle(dst.x + border + 2, dst.y + border + 2, 5,
+				  dst.height - 2 * border - 4, warning);
+
+	// Inner border
+	const float innerMargin = border + 5;
+
+	DrawRectangleLinesEx({dst.x + innerMargin, dst.y + innerMargin,
+						  dst.width - 2 * innerMargin,
+						  dst.height - 2 * innerMargin},
+						 2, rust);
+
+	// Reinforced corners
+	const float cornerLen = 17.0f;
+	const float thick = 4.0f;
+	const float p = innerMargin + 2;
 
 	Vector2 tl = {dst.x + p, dst.y + p};
-	DrawLineEx(tl, {tl.x + cornerLen, tl.y}, thick, goldAccent);
-	DrawLineEx(tl, {tl.x, tl.y + cornerLen}, thick, goldAccent);
-
 	Vector2 tr = {dst.x + dst.width - p, dst.y + p};
-	DrawLineEx(tr, {tr.x - cornerLen, tr.y}, thick, goldAccent);
-	DrawLineEx(tr, {tr.x, tr.y + cornerLen}, thick, goldAccent);
-
 	Vector2 bl = {dst.x + p, dst.y + dst.height - p};
-	DrawLineEx(bl, {bl.x + cornerLen, bl.y}, thick, goldAccent);
-	DrawLineEx(bl, {bl.x, bl.y - cornerLen}, thick, goldAccent);
-
 	Vector2 br = {dst.x + dst.width - p, dst.y + dst.height - p};
-	DrawLineEx(br, {br.x - cornerLen, br.y}, thick, goldAccent);
-	DrawLineEx(br, {br.x, br.y - cornerLen}, thick, goldAccent);
 
-	const float niteRadius = 3;
-	DrawCircle(tl.x, tl.y, niteRadius, darkWood);
-	DrawCircle(tr.x, tr.y, niteRadius, darkWood);
-	DrawCircle(bl.x, bl.y, niteRadius, darkWood);
-	DrawCircle(br.x, br.y, niteRadius, darkWood);
+	DrawLineEx(tl, {tl.x + cornerLen, tl.y}, thick, warning);
+	DrawLineEx(tl, {tl.x, tl.y + cornerLen}, thick, warning);
 
+	DrawLineEx(tr, {tr.x - cornerLen, tr.y}, thick, warning);
+	DrawLineEx(tr, {tr.x, tr.y + cornerLen}, thick, warning);
+
+	DrawLineEx(bl, {bl.x + cornerLen, bl.y}, thick, warning);
+	DrawLineEx(bl, {bl.x, bl.y - cornerLen}, thick, warning);
+
+	DrawLineEx(br, {br.x - cornerLen, br.y}, thick, warning);
+	DrawLineEx(br, {br.x, br.y - cornerLen}, thick, warning);
+
+	// Rivets
+	const float rivetRadius = 3.0f;
+
+	DrawCircleV(tl, rivetRadius, darkMetal);
+	DrawCircleV(tr, rivetRadius, darkMetal);
+	DrawCircleV(bl, rivetRadius, darkMetal);
+	DrawCircleV(br, rivetRadius, darkMetal);
+
+	// Rust details
+	DrawRectangle(dst.x + 5, dst.y + 5, 20, 4, rust);
+	DrawRectangle(dst.x + dst.width - 25, dst.y + dst.height - 9, 20, 4, rust);
+
+	// Button text
 	float fontSize = 20.0f;
 
 	if (font.texture.id != GetFontDefault().texture.id)
 		fontSize = 40.0f;
-	float fontSpacing = 1.0f;
+
+	const float fontSpacing = 1.0f;
 
 	Vector2 textSize = MeasureTextEx(font, text, fontSize, fontSpacing);
 
-	float textX = (dst.x + dst.width / 2.0f) - (textSize.x / 2.0f);
-	float textY = (dst.y + dst.height / 2.0f) - (textSize.y / 2.0f);
+	float textX = dst.x + dst.width / 2.0f - textSize.x / 2.0f;
+	float textY = dst.y + dst.height / 2.0f - textSize.y / 2.0f;
 
-	DrawTextEx(font, text, {textX, textY}, fontSize, fontSpacing, darkWood);
+	DrawTextEx(font, text, {textX + 1, textY + 2}, fontSize, fontSpacing,
+			   {0, 0, 0, 100});
+
+	DrawTextEx(font, text, {textX, textY}, fontSize, fontSpacing, textColor);
 }
+
 } // namespace gfx

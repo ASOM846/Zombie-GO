@@ -1,7 +1,7 @@
 #include "weaponCard.hpp"
 #include "playerCard.hpp"
 
-SwordCard::SwordCard() {
+MeleWeaponCard::MeleWeaponCard() {
 	struct WeaponParms {
 		std::string name;
 		TextureId texture;
@@ -29,15 +29,15 @@ SwordCard::SwordCard() {
 	attack = GetRandomValue(3, 8);
 }
 
-void SwordCard::RenderContent(Vector2 offset, Vector2 cellSize,
-							  TextureManager &tm) {}
+void MeleWeaponCard::RenderContent(Vector2 offset, Vector2 cellSize,
+								   TextureManager &tm) {}
 
-std::string SwordCard::GetValueText() const {
+std::string MeleWeaponCard::GetValueText() const {
 	return std::to_string(attack);
 }
 
-bool SwordCard::Interact(PlayerCard &player) {
-	player.currentWeapon = std::make_shared<SwordCard>(*this);
+bool MeleWeaponCard::Interact(PlayerCard &player) {
+	player.currentWeapon = std::make_shared<MeleWeaponCard>(*this);
 
 	return true;
 }

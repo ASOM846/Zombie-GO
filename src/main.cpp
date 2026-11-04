@@ -26,11 +26,11 @@ int main() {
 	int screenWidth = static_cast<int>(screenHeight * 9.0f / 19.5f);
 
 	// #if defined(__ANDROID__)
-	// 	width = height = 0;
+	screenWidth = screenHeight = 0;
 	// #endif
 
-	SetWindowState(FLAG_WINDOW_RESIZABLE);
-	SetWindowState(FLAG_VSYNC_HINT);
+	// SetWindowState(FLAG_WINDOW_RESIZABLE);
+	// SetWindowState(FLAG_VSYNC_HINT);
 
 	InitWindow(screenWidth, screenHeight, "VaultStep");
 
@@ -45,14 +45,14 @@ int main() {
 
 	Ui ui;
 
-	WindowState currentState{WindowState::MENU};
+	WindowState currentState{WindowState::GAME};
 
 	while (!WindowShouldClose()) {
 		BeginDrawing();
-		ClearBackground(DARKBLUE);
+		ClearBackground(DARKGRAY);
 
-		DrawBackground(game.GetTextureManager()->get(TextureId::BCG_0));
-		DrawBackground(game.GetTextureManager()->get(TextureId::VIGNETTE_0));
+		// DrawBackground(game.GetTextureManager()->get(TextureId::BCG_0));
+		// DrawBackground(game.GetTextureManager()->get(TextureId::VIGNETTE_0));
 
 		auto switchState = [&currentState, &game, &menu](WindowState newState) {
 			if (currentState == newState) {

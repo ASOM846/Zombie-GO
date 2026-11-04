@@ -1,6 +1,7 @@
 #pragma once
 
 #include "card.hpp"
+#include <memory>
 
 class SpellRecepieCard : public Card {
   public:

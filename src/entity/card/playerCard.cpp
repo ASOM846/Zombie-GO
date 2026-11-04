@@ -3,7 +3,7 @@
 PlayerCard::PlayerCard() {
 	name = "PLAYER";
 
-	currentWeapon = std::make_shared<SwordCard>();
+	currentWeapon = std::make_shared<MeleWeaponCard>();
 	currentWeapon->name = "SWORD";
 	currentWeapon->attack = 5;
 

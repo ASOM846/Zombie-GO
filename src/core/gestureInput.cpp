@@ -1,6 +1,6 @@
 #include "gestureInput.hpp"
+#include <cmath>
 #include <raymath.h>
-
 void GestureInput::Update() {
 	lastGesture = currentGesture;
 

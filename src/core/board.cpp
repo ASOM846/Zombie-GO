@@ -297,7 +297,7 @@ std::shared_ptr<Card> Board::GetRandomCard() {
 			{10, []() { return std::make_shared<HealthPotionCard>(); }},
 			{10, []() { return std::make_shared<SpellRecepieCard>(); }},
 			{10, []() { return std::make_shared<ChestCard>(); }},
-			{10, []() { return std::make_shared<SwordCard>(); }}};
+			{10, []() { return std::make_shared<MeleWeaponCard>(); }}};
 
 	int totalWeight = 0;
 	for (const auto &entry : weightedPool) {

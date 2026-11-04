@@ -2,10 +2,10 @@
 
 #include "card.hpp"
 
-class SwordCard : public Card {
+class MeleWeaponCard : public Card {
   public:
-	SwordCard();
-	~SwordCard() override = default;
+	MeleWeaponCard();
+	~MeleWeaponCard() override = default;
 
 	void RenderContent(Vector2 offset, Vector2 cellSize,
 					   TextureManager &tm) override;
