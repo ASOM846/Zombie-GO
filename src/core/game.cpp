@@ -27,6 +27,7 @@ void Game::Reset() {
 void Game::Update() {
 	board.Update(screenShake);
 	board.UpdateHighlights(selectedSpell);
+	board.RecalculateDrawindVariables(spellsButton.rect.height);
 	screenShake.update(GetFrameTime());
 
 	gestureInput.Update();
@@ -139,11 +140,11 @@ void Game::Render() {
 	spellsButton.Draw(GetFontDefault());
 	goBackButton.Draw(GetFontDefault());
 
-	if (selectedSpell) {
-		DrawText(selectedSpell->name.c_str(), 100, 300, 30, GREEN);
-	} else {
-		DrawText("SPELL NOT SELECTED", 100, 300, 30, GREEN);
-	}
+	// if (selectedSpell) {
+	// 	DrawText(selectedSpell->name.c_str(), 100, 300, 30, GREEN);
+	// } else {
+	// 	DrawText("SPELL NOT SELECTED", 100, 300, 30, GREEN);
+	// }
 
 	if (board.GetPlayer()->hp <= 0) {
 		RenderLose();
@@ -175,7 +176,7 @@ void Game::RenderLose() {
 
 void Game::UpdateButtonPos() {
 	int btnWidth = board.GetCellWidth();
-	int btnHeight = 50;
+	int btnHeight = 50 * gfx::userFontScale;
 
 	spellsButton.rect = {
 		.x = static_cast<float>(GetScreenWidth() / 2 - btnWidth / 2),

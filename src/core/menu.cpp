@@ -2,7 +2,9 @@
 #include <raylib.h>
 
 void Menu::Init() {
-	startGameButton.text = "startGame";
+	startGameButton.text = "Start Game";
+	scaleUpButton.text = ">";
+	scaleDownButton.text = "<";
 
 	shouldGameStart = false;
 
@@ -21,11 +23,23 @@ void Menu::Update() {
 		shouldGameStart = true;
 	}
 
+	if (scaleDownButton.IsClicked(GetMousePosition())) {
+		gfx::userFontScale -= 0.10;
+	}
+
+	if (scaleUpButton.IsClicked(GetMousePosition())) {
+		gfx::userFontScale += 0.10;
+	}
+
 	startGameButton.Update(GetMousePosition());
+	scaleDownButton.Update(GetMousePosition());
+	scaleUpButton.Update(GetMousePosition());
 }
 
 void Menu::Render() {
 	startGameButton.Draw(GetFontDefault());
+	scaleDownButton.Draw(GetFontDefault());
+	scaleUpButton.Draw(GetFontDefault());
 }
 
 bool Menu::ShouldGameStart() const {
@@ -33,14 +47,25 @@ bool Menu::ShouldGameStart() const {
 }
 
 void Menu::InitButtonsPositions() {
-	Vector2 startButtonSize = {150, 50};
-	Vector2 startButtonPos = {
-		GetScreenWidth() / 2 - startButtonSize.x / 2,
-		GetScreenHeight() / 2 - startButtonSize.y / 2,
-	};
+	const float screenCenterX = GetScreenWidth() / 2.0f;
+	const float screenCenterY = GetScreenHeight() / 2.0f;
 
-	startGameButton.rect = {.x = startButtonPos.x,
-							.y = startButtonPos.y,
-							.width = startButtonSize.x,
-							.height = startButtonSize.y};
+	const Vector2 buttonSize = {150 * gfx::userFontScale,
+								50 * gfx::userFontScale};
+	const float buttonSpacing = 80.0f * gfx::userFontScale;
+
+	startGameButton.rect = {.x = screenCenterX - buttonSize.x / 2.0f,
+							.y = screenCenterY - buttonSize.y / 2.0f,
+							.width = buttonSize.x,
+							.height = buttonSize.y};
+
+	scaleDownButton.rect = {.x = screenCenterX - buttonSize.x - buttonSpacing,
+							.y = screenCenterY - buttonSize.y / 2.0f,
+							.width = buttonSize.x,
+							.height = buttonSize.y};
+
+	scaleUpButton.rect = {.x = screenCenterX + buttonSpacing,
+						  .y = screenCenterY - buttonSize.y / 2.0f,
+						  .width = buttonSize.x,
+						  .height = buttonSize.y};
 }

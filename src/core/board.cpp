@@ -9,6 +9,7 @@
 #include "../entity/card/trapCard.hpp"
 #include "../entity/card/weaponCard.hpp"
 #include "../entity/spell/spell.hpp"
+#include "../graphics/gfx.hpp"
 #include "../textureManager.hpp"
 
 #include <functional>
@@ -32,8 +33,6 @@ void Board::Reset() {
 
 void Board::Update(ScreenShake &ss) {
 	float dt = GetFrameTime();
-
-	RecalculateDrawindVariables();
 
 	Vector2 cellSize = {static_cast<float>(cellWidth),
 						static_cast<float>(cellHeight)};
@@ -317,9 +316,13 @@ std::shared_ptr<Card> Board::GetRandomCard() {
 	return std::make_shared<EnemyCard>();
 }
 
-void Board::RecalculateDrawindVariables() {
+void Board::RecalculateDrawindVariables(int bottomButtonsHeight) {
 	int screenWidth = GetScreenWidth();
 	int screenHeight = GetScreenHeight();
+
+	int buttonBoardSpacing = 50 * gfx::userFontScale;
+
+	minOffset.y = bottomButtonsHeight + buttonBoardSpacing;
 
 	touchRec = {.x = minOffset.x,
 				.y = minOffset.y,

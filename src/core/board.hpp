@@ -32,7 +32,7 @@ class Board {
 	int const &GetSpacing() { return spacing; }
 	int const &GetCellWidth() { return cellWidth; }
 
-	void RecalculateDrawindVariables();
+	void RecalculateDrawindVariables(int bottomButtonsHeight);
 
   private:
 	void RenderCell();
@@ -53,7 +53,7 @@ class Board {
 
 	int maxCellWidth;
 
-	const int spacing = 30;
+	const int spacing = 15;
 
 	Vector2 minOffset{0, 100};
 	Vector2 boardOffset{};

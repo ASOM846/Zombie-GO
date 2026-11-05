@@ -4,6 +4,7 @@
 #include "core/menu.hpp"
 #include "core/ui.hpp"
 #include "graphics/fpsGraph.hpp"
+#include "graphics/gfx.hpp"
 
 enum class WindowState {
 	GAME,
@@ -29,7 +30,7 @@ int main() {
 	screenWidth = screenHeight = 0;
 	// #endif
 
-	// SetWindowState(FLAG_WINDOW_RESIZABLE);
+	SetWindowState(FLAG_WINDOW_RESIZABLE);
 	// SetWindowState(FLAG_VSYNC_HINT);
 
 	InitWindow(screenWidth, screenHeight, "VaultStep");
@@ -98,8 +99,10 @@ int main() {
 
 			break;
 		}
-		tickFPSGraph(GetFPS());
-		drawFPSGraph(0, 0);
+		// tickFPSGraph(GetFPS());
+		// drawFPSGraph(0, 0);
+
+		DrawText(std::to_string(gfx::userFontScale).c_str(), 200, 200, 30, RED);
 		EndDrawing();
 	}
 

@@ -17,5 +17,8 @@ class Menu {
 
 	Button startGameButton;
 
+	Button scaleDownButton;
+	Button scaleUpButton;
+
 	bool shouldGameStart;
 };

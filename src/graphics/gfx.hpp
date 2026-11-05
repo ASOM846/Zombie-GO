@@ -3,11 +3,13 @@
 #include "../entity/card/card.hpp"
 #include <raylib.h>
 
+#include "../entity/card/playerCard.hpp"
+
 #include <algorithm>
 #include <string>
 
 namespace gfx {
-inline float userScale = 1.0f;
+inline float userFontScale = 1.00f;
 
 inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 						 Vector2 cellSize, TextureManager &tm, Card &card) {
@@ -74,12 +76,15 @@ inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 	}
 
 	// Card name
-	const int fontSize = 20;
+	const int fontSize = std::max(1, static_cast<int>(20 * userFontScale));
+
 	const char *text = card.name.c_str();
 
 	const int textWidth = MeasureText(text, fontSize);
+	const float nameOffsetY = 16.0f * userFontScale;
 
-	Vector2 namePos = transform(centerX - textWidth / 2.0f, position.y + 16);
+	Vector2 namePos =
+		transform(centerX - textWidth / 2.0f, position.y + nameOffsetY);
 
 	// Dark text shadow
 	DrawText(text, static_cast<int>(namePos.x + 1),
@@ -90,24 +95,27 @@ inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 			 std::max(1, static_cast<int>(fontSize * s)), textColor);
 
 	// Top separator
-	const float topSepY = position.y + 42;
+	const float topSepY = position.y + 42 * userFontScale;
 
-	drawLine({position.x + 14, topSepY}, {position.x + width - 14, topSepY}, 2,
-			 RED);
+	// drawLine({position.x + 14, topSepY}, {position.x + width - 14, topSepY},
+	// 2, 		 RED);
 
 	// Bottom separator
-	const float bottomSepY = position.y + height - 46;
+	const float bottomSepY = position.y + height - 46 * userFontScale;
 
-	drawLine({position.x + 14, bottomSepY},
-			 {position.x + width - 14, bottomSepY}, 2, RED);
+	// drawLine({position.x + 14, bottomSepY},
+	// 		 {position.x + width - 14, bottomSepY}, 2, RED);
 
 	// Card value
 	std::string valueStr = card.GetValueText();
 
-	const int valueFontSize = 24;
+	const int valueFontSize = std::max(1, static_cast<int>(24 * userFontScale));
+
 	const int valueWidth = MeasureText(valueStr.c_str(), valueFontSize);
 
-	Vector2 valuePos = transform(centerX - valueWidth / 2.0f, bottomSepY + 8);
+	const float valueOffsetY = 8.0f * userFontScale;
+	Vector2 valuePos =
+		transform(centerX - valueWidth / 2.0f, bottomSepY + valueOffsetY);
 
 	DrawText(valueStr.c_str(), static_cast<int>(valuePos.x),
 			 static_cast<int>(valuePos.y),
@@ -116,10 +124,11 @@ inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 	// Card artwork – dopasowanie tekstury z zachowaniem proporcji
 	const Texture2D &texture = tm.get(card.textureId);
 
-	const float texturePadding = 12.0f;
+	const float texturePadding = 12.0f * userFontScale;
+	const float textureGap = 8.0F * userFontScale;
 
 	const float availableWidth = width - texturePadding * 2.0f;
-	const float availableHeight = bottomSepY - topSepY - 16.0f;
+	const float availableHeight = bottomSepY - topSepY - textureGap * 2.0f;
 
 	// Skala dopasowująca teksturę do dostępnego obszaru
 	const float scaleX = availableWidth / texture.width;
@@ -141,86 +150,70 @@ inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 					  drawWidth * s, drawHeight * s};
 
 	DrawTexturePro(texture, source, dest, {0.0f, 0.0f}, 0.0f, RAYWHITE);
+
+	if (auto *playerCard = dynamic_cast<PlayerCard *>(&card)) {
+		if (playerCard->currentWeapon) {
+			const Texture2D &weaponTex =
+				tm.get(playerCard->currentWeapon->textureId);
+
+			float weaponBaseScale = 3.0f;
+			float wDrawWidth = weaponTex.width * weaponBaseScale;
+			float wDrawHeight = weaponTex.height * weaponBaseScale;
+
+			// Pozycja lokalna względem środka karty
+			float localX = centerX - (wDrawWidth / 2.0f) - (cellSize.x / 4.0f);
+			float localY = centerY - (wDrawHeight / 2.0f) - 15.0f;
+
+			Vector2 weaponPos = transform(localX, localY);
+
+			Rectangle weaponSource = {0.0f, 0.0f,
+									  static_cast<float>(weaponTex.width),
+									  static_cast<float>(weaponTex.height)};
+
+			Rectangle weaponDest = {weaponPos.x, weaponPos.y, wDrawWidth * s,
+									wDrawHeight * s};
+
+			DrawTexturePro(weaponTex, weaponSource, weaponDest, {0.0f, 0.0f},
+						   0.0f, RAYWHITE);
+		}
+	}
 }
 
 inline void DrawButton(const Rectangle &dst, const char *text,
 					   float shadowOffset, const Font &font) {
 
-	const Color shadow = {0, 0, 0, 180};
-	const Color darkMetal = {23, 29, 26, 255};
-	const Color metal = {48, 55, 48, 255};
-	const Color dirtyPaper = {173, 166, 132, 255};
-	const Color rust = {125, 65, 35, 255};
-	const Color warning = {190, 153, 55, 255};
-	const Color textColor = {29, 32, 25, 255};
+	// Background – główne tło gry
+	const Color background = {32, 36, 38, 255};
 
-	// Shadow
-	DrawRectangle(dst.x + shadowOffset, dst.y + shadowOffset, dst.width,
-				  dst.height, shadow);
+	// Panel – karty, przyciski, panele UI
+	const Color panel = {56, 62, 64, 255};
 
-	// Outer casing
-	DrawRectangle(dst.x, dst.y, dst.width, dst.height, darkMetal);
+	// Border – ramki, separatory
+	const Color border = {91, 98, 99, 255};
 
-	// Metal body
-	DrawRectangle(dst.x + 3, dst.y + 3, dst.width - 6, dst.height - 6, metal);
+	// Primary Text – nazwy, nagłówki
+	const Color textColor = {210, 212, 208, 255};
 
-	const float border = 8.0f;
+	// Secondary Text – opisy, mniej ważne informacje
+	const Color secondaryText = {165, 170, 170, 255};
 
-	// Inner panel
-	DrawRectangle(dst.x + border, dst.y + border, dst.width - 2 * border,
-				  dst.height - 2 * border, dirtyPaper);
+	// Shadow – cienie pod kartami i przyciskami
+	const Color shadow = {0, 0, 0, 120};
 
-	// Warning stripe
-	DrawRectangle(dst.x + border + 2, dst.y + border + 2, 5,
-				  dst.height - 2 * border - 4, warning);
+	const float width = dst.width;
+	const float height = dst.height;
 
-	// Inner border
-	const float innerMargin = border + 5;
+	// Card shadow
+	DrawRectangleRec({dst.x + 5, dst.y + 6, dst.width, dst.height}, shadow);
 
-	DrawRectangleLinesEx({dst.x + innerMargin, dst.y + innerMargin,
-						  dst.width - 2 * innerMargin,
-						  dst.height - 2 * innerMargin},
-						 2, rust);
+	// card border
+	DrawRectangleRec(dst, shadow);
 
-	// Reinforced corners
-	const float cornerLen = 17.0f;
-	const float thick = 4.0f;
-	const float p = innerMargin + 2;
-
-	Vector2 tl = {dst.x + p, dst.y + p};
-	Vector2 tr = {dst.x + dst.width - p, dst.y + p};
-	Vector2 bl = {dst.x + p, dst.y + dst.height - p};
-	Vector2 br = {dst.x + dst.width - p, dst.y + dst.height - p};
-
-	DrawLineEx(tl, {tl.x + cornerLen, tl.y}, thick, warning);
-	DrawLineEx(tl, {tl.x, tl.y + cornerLen}, thick, warning);
-
-	DrawLineEx(tr, {tr.x - cornerLen, tr.y}, thick, warning);
-	DrawLineEx(tr, {tr.x, tr.y + cornerLen}, thick, warning);
-
-	DrawLineEx(bl, {bl.x + cornerLen, bl.y}, thick, warning);
-	DrawLineEx(bl, {bl.x, bl.y - cornerLen}, thick, warning);
-
-	DrawLineEx(br, {br.x - cornerLen, br.y}, thick, warning);
-	DrawLineEx(br, {br.x, br.y - cornerLen}, thick, warning);
-
-	// Rivets
-	const float rivetRadius = 3.0f;
-
-	DrawCircleV(tl, rivetRadius, darkMetal);
-	DrawCircleV(tr, rivetRadius, darkMetal);
-	DrawCircleV(bl, rivetRadius, darkMetal);
-	DrawCircleV(br, rivetRadius, darkMetal);
-
-	// Rust details
-	DrawRectangle(dst.x + 5, dst.y + 5, 20, 4, rust);
-	DrawRectangle(dst.x + dst.width - 25, dst.y + dst.height - 9, 20, 4, rust);
+	// Main metal surface
+	DrawRectangle(dst.x + 3, dst.y + 3, width - 6, height - 6, panel);
 
 	// Button text
-	float fontSize = 20.0f;
-
-	if (font.texture.id != GetFontDefault().texture.id)
-		fontSize = 40.0f;
+	float fontSize = 20.0f * gfx::userFontScale;
 
 	const float fontSpacing = 1.0f;
 
@@ -234,5 +227,4 @@ inline void DrawButton(const Rectangle &dst, const char *text,
 
 	DrawTextEx(font, text, {textX, textY}, fontSize, fontSpacing, textColor);
 }
-
 } // namespace gfx

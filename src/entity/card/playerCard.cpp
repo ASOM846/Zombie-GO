@@ -16,23 +16,7 @@ PlayerCard::PlayerCard() {
 }
 
 void PlayerCard::RenderContent(Vector2 offset, Vector2 cellSize,
-							   TextureManager &tm) {
-
-	if (currentWeapon) {
-		float centerX = offset.x + cellSize.x / 2.0f;
-		float centerY = offset.y + cellSize.y / 2.0f;
-
-		const Texture2D &texture = tm.get(currentWeapon->textureId);
-
-		float scale = 3.0F;
-
-		float drawX = centerX - (texture.width * scale) / 2.0f - cellSize.x / 4;
-		float drawY = centerY - (texture.height * scale) / 2.0f;
-
-		DrawTextureEx(texture, {drawX, drawY - 5 * scale}, 0.0f, scale,
-					  RAYWHITE);
-	}
-}
+							   TextureManager &tm) {}
 
 std::string PlayerCard::GetValueText() const {
 	if (currentWeapon)

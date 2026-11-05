@@ -39,7 +39,7 @@ struct Button {
 		// DrawRectangleRec(rect, MAGENTA);
 
 		// Vector2 textSize =
-		MeasureTextEx(GetFontDefault(), text, fontSize, fontSpacing);
+		// MeasureTextEx(GetFontDefault(), text, fontSize, fontSpacing);
 
 		// Vector2 finalPos = {{rect.x + rect.width / 2 - textSize.x / 2},
 		//	{rect.y + rect.height / 2 - textSize.y / 2}};
