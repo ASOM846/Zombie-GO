@@ -7,7 +7,7 @@
 #include <vector>
 
 SpellRecepieCard::SpellRecepieCard() {
-	name = "SPELL";
+	name = "PICKABLE";
 
 	auto GetRandomSpell = []() {
 		std::vector<std::pair<int, std::function<std::shared_ptr<Pickable>()>>>
@@ -39,7 +39,11 @@ SpellRecepieCard::SpellRecepieCard() {
 void SpellRecepieCard::RenderContent(Vector2 offset, Vector2 cellSize,
 									 TextureManager &tm) {}
 
-std::string SpellRecepieCard::GetValueText() const {
+std::string SpellRecepieCard::GetTopText() const {
+	return name;
+}
+
+std::string SpellRecepieCard::GetBottomText() const {
 	return pickable->name;
 }
 

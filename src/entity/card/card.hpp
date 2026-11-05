@@ -24,7 +24,8 @@ class Card {
 
 	virtual void Render(Vector2 offset, Vector2 cellSize, TextureManager &tm);
 
-	[[nodiscard]] virtual std::string GetValueText() const = 0;
+	[[nodiscard]] virtual std::string GetTopText() const = 0;
+	[[nodiscard]] virtual std::string GetBottomText() const = 0;
 
   protected:
 	virtual void RenderContent(Vector2 offset, Vector2 cellSize,
@@ -50,6 +51,7 @@ class Card {
 	bool isSpawning = true;
 
 	int hp;
+
 	std::string name;
 
 	Color gradientColor{BLANK};

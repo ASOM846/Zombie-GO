@@ -11,12 +11,16 @@ TrapCard::TrapCard() {
 void TrapCard::RenderContent(Vector2 offset, Vector2 cellSize,
 							 TextureManager &tm) {}
 
-std::string TrapCard::GetValueText() const {
+std::string TrapCard::GetTopText() const {
+	return name;
+}
+
+std::string TrapCard::GetBottomText() const {
 	return std::to_string(attack);
 }
 
 InteractionResult TrapCard::Interact(PlayerCard &player) {
-	player.hp -= attack;
+	player.TakeDamage(attack);
 
 	return {.replace = true, .replaceInto = nullptr};
 }

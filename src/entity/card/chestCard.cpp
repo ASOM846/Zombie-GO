@@ -10,7 +10,11 @@ ChestCard::ChestCard() {
 void ChestCard::RenderContent(Vector2 offset, Vector2 cellSize,
 							  TextureManager &tm) {}
 
-std::string ChestCard::GetValueText() const {
+std::string ChestCard::GetTopText() const {
+	return name;
+}
+
+std::string ChestCard::GetBottomText() const {
 	return "";
 }
 

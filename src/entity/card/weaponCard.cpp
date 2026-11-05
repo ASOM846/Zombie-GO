@@ -1,6 +1,8 @@
 #include "weaponCard.hpp"
 #include "card.hpp"
 #include "playerCard.hpp"
+#include <raylib.h>
+#include <string>
 
 MeleWeaponCard::MeleWeaponCard() {
 	struct WeaponParms {
@@ -25,14 +27,23 @@ MeleWeaponCard::MeleWeaponCard() {
 	name = parms.name;
 	textureId = parms.texture;
 
-	attack = GetRandomValue(3, 8);
+	minAttack = GetRandomValue(1, 5);
+	maxAttack = minAttack + GetRandomValue(2, 5);
+
+	maxDurability = GetRandomValue(2, 4);
+	currentDurability = maxDurability;
 }
 
 void MeleWeaponCard::RenderContent(Vector2 offset, Vector2 cellSize,
 								   TextureManager &tm) {}
 
-std::string MeleWeaponCard::GetValueText() const {
-	return std::to_string(attack);
+std::string MeleWeaponCard::GetTopText() const {
+	return name;
+}
+
+std::string MeleWeaponCard::GetBottomText() const {
+	return {std::to_string(minAttack) + "-" + std::to_string(maxAttack) +
+			" / " + std::to_string(currentDurability)};
 }
 
 InteractionResult MeleWeaponCard::Interact(PlayerCard &player) {

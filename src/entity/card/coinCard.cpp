@@ -17,7 +17,11 @@ CoinCard::CoinCard(int p_value) {
 void CoinCard::RenderContent(Vector2 offset, Vector2 cellSize,
 							 TextureManager &tm) {}
 
-std::string CoinCard::GetValueText() const {
+std::string CoinCard::GetTopText() const {
+	return name;
+}
+
+std::string CoinCard::GetBottomText() const {
 	return std::to_string(value);
 }
 

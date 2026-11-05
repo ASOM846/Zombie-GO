@@ -3,6 +3,7 @@
 #include "../../graphics/floatingText.hpp"
 #include "card.hpp"
 #include <raylib.h>
+#include <string>
 
 PlayerCard::PlayerCard() {
 	name = "SURVIVOR";
@@ -20,12 +21,19 @@ PlayerCard::PlayerCard() {
 void PlayerCard::RenderContent(Vector2 offset, Vector2 cellSize,
 							   TextureManager &tm) {}
 
-std::string PlayerCard::GetValueText() const {
-	if (currentWeapon)
-		return std::string{std::to_string(hp) + "/" + std::to_string(maxHp) +
-						   "  |  " + std::to_string(currentWeapon->attack)};
+std::string PlayerCard::GetTopText() const {
+	if (currentWeapon) {
+		return {name + " " + std::to_string(hp) + "/" + std::to_string(maxHp)};
+	}
 
-	return std::string{std::to_string(hp) + "/" + std::to_string(maxHp)};
+	return name;
+}
+
+std::string PlayerCard::GetBottomText() const {
+	if (currentWeapon)
+		return std::string{currentWeapon->GetBottomText()};
+
+	return std::to_string(hp) + "/" + std::to_string(maxHp);
 }
 
 InteractionResult PlayerCard::Interact(PlayerCard &player) {

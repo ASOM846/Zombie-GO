@@ -2,6 +2,7 @@
 #include "card.hpp"
 #include "coinCard.hpp"
 #include "playerCard.hpp"
+#include <iostream>
 
 ActiveEnemyCard::ActiveEnemyCard() {
 	hp = GetRandomValue(1, 6);
@@ -22,38 +23,51 @@ ActiveEnemyCard::ActiveEnemyCard() {
 void ActiveEnemyCard::RenderContent(Vector2 offset, Vector2 cellSize,
 									TextureManager &tm) {}
 
-std::string ActiveEnemyCard::GetValueText() const {
+std::string ActiveEnemyCard::GetTopText() const {
+	return {name};
+}
+
+std::string ActiveEnemyCard::GetBottomText() const {
 	return std::to_string(hp);
 }
 
 InteractionResult ActiveEnemyCard::Interact(PlayerCard &player) {
 	int playerDmg = 0;
+	int startHp = hp;
 
-	if (player.currentWeapon && player.currentWeapon->attack > 0) {
-		playerDmg = player.currentWeapon->attack;
+	if (player.currentWeapon && player.currentWeapon->currentDurability > 0) {
 
-		player.currentWeapon->attack -= hp;
-		hp -= playerDmg;
+		playerDmg = GetRandomValue(player.currentWeapon->minAttack,
+								   player.currentWeapon->maxAttack);
 
-		if (player.currentWeapon->attack <= 0) {
-			player.currentWeapon->attack = 0;
-			player.currentWeapon.reset();
-		}
+		TakeDamage(playerDmg);
+
+		player.currentWeapon->currentDurability -= 1;
 	} else {
-		playerDmg = player.hp;
-
-		player.hp -= hp;
-		hp -= playerDmg;
-
-		if (player.hp < 0)
-			player.hp = 0;
+		if (player.hp > hp) {
+			int dmgToDeal = hp;
+			player.TakeDamage(dmgToDeal);
+			TakeDamage(dmgToDeal);
+		} else {
+			int dmgToDeal = player.hp;
+			TakeDamage(dmgToDeal);
+			player.TakeDamage(dmgToDeal);
+		}
 	}
+
+	if (player.currentWeapon && player.currentWeapon->currentDurability <= 0) {
+		player.currentWeapon.reset();
+	}
+
+	// std::cerr << "damage dealt::::  " << std::to_string(playerDmg) <<
+	// std::endl;
 
 	if (hp > 0) {
 		return {.replace = false, .replaceInto = nullptr};
 	}
 
-	return {.replace = true, .replaceInto = std::make_shared<CoinCard>()};
+	return {.replace = true,
+			.replaceInto = std::make_shared<CoinCard>(startHp)};
 }
 
 void ActiveEnemyCard::AutoAction(PlayerCard &player) {

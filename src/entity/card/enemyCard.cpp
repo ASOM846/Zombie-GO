@@ -1,10 +1,9 @@
 #include "enemyCard.hpp"
-#include "../../graphics/floatingText.hpp"
-#include "../../graphics/gfx.hpp"
 #include "card.hpp"
 #include "coinCard.hpp"
 #include "playerCard.hpp"
 #include <memory>
+#include <raylib.h>
 #include <string>
 #include <vector>
 
@@ -28,7 +27,11 @@ EnemyCard::EnemyCard() {
 void EnemyCard::RenderContent(Vector2 offset, Vector2 cellSize,
 							  TextureManager &tm) {}
 
-std::string EnemyCard::GetValueText() const {
+std::string EnemyCard::GetTopText() const {
+	return {name};
+}
+
+std::string EnemyCard::GetBottomText() const {
 	return std::to_string(hp);
 }
 
@@ -36,24 +39,27 @@ InteractionResult EnemyCard::Interact(PlayerCard &player) {
 	int playerDmg = 0;
 	int startHp = hp;
 
-	if (player.currentWeapon && player.currentWeapon->attack > 0) {
-		playerDmg = player.currentWeapon->attack;
+	if (player.currentWeapon && player.currentWeapon->currentDurability > 0) {
+		playerDmg = GetRandomValue(player.currentWeapon->minAttack,
+								   player.currentWeapon->maxAttack);
 
-		player.currentWeapon->attack -= hp;
 		TakeDamage(playerDmg);
 
-		if (player.currentWeapon->attack <= 0) {
-			player.currentWeapon->attack = 0;
-			player.currentWeapon.reset();
-		}
+		player.currentWeapon->currentDurability -= 1;
 	} else {
-		playerDmg = player.hp;
+		if (player.hp > hp) {
+			int dmgToDeal = hp;
+			player.TakeDamage(dmgToDeal);
+			TakeDamage(dmgToDeal);
+		} else {
+			int dmgToDeal = player.hp;
+			TakeDamage(dmgToDeal);
+			player.TakeDamage(dmgToDeal);
+		}
+	}
 
-		player.hp -= hp;
-		TakeDamage(playerDmg);
-
-		if (player.hp < 0)
-			player.hp = 0;
+	if (player.currentWeapon && player.currentWeapon->currentDurability <= 0) {
+		player.currentWeapon.reset();
 	}
 
 	if (hp > 0) {

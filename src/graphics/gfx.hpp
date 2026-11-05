@@ -73,6 +73,10 @@ inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 		drawRect(position.x, position.y, width, height, card.gradientColor);
 	}
 
+	if (auto *playerCard = dynamic_cast<PlayerCard *>(&card)) {
+		drawRect(position.x, position.y, width, height, BLUE);
+	}
+
 	// Main metal surface
 	drawRect(position.x + 3, position.y + 3, width - 6, height - 6, panel);
 
@@ -86,7 +90,7 @@ inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 	// Card name
 	const int fontSize = std::max(1, static_cast<int>(20 * userFontScale));
 
-	const char *text = card.name.c_str();
+	const char *text = card.GetTopText().c_str();
 
 	const int textWidth = MeasureText(text, fontSize);
 	const float nameOffsetY = 16.0f * userFontScale;
@@ -115,7 +119,7 @@ inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 	// 		 {position.x + width - 14, bottomSepY}, 2, RED);
 
 	// Card value
-	std::string valueStr = card.GetValueText();
+	std::string valueStr = card.GetBottomText();
 
 	const int valueFontSize = std::max(1, static_cast<int>(24 * userFontScale));
 
@@ -161,6 +165,30 @@ inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 
 	if (auto *playerCard = dynamic_cast<PlayerCard *>(&card)) {
 		if (playerCard->currentWeapon) {
+			float rectSize = 5;
+
+			auto weapon = playerCard->currentWeapon;
+
+			float numberOfSpacings = weapon->maxDurability + 1;
+
+			float spacingLength =
+				((width - (rectSize * weapon->maxDurability)) /
+				 numberOfSpacings);
+
+			for (int i = 0; i < weapon->maxDurability; i++) {
+				float x = spacingLength * (i + 1) + rectSize * i;
+
+				DrawRectangle(position.x + x, bottomSepY, rectSize, rectSize,
+							  shadow);
+			}
+
+			for (int i = 0; i < weapon->currentDurability; i++) {
+				float x = spacingLength * (i + 1) + rectSize * i;
+
+				DrawRectangle(position.x + x, bottomSepY, rectSize, rectSize,
+							  textColor);
+			}
+
 			const Texture2D &weaponTex =
 				tm.get(playerCard->currentWeapon->textureId);
 
