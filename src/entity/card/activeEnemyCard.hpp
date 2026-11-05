@@ -12,7 +12,7 @@ class ActiveEnemyCard : public Card {
 
 	[[nodiscard]] std::string GetValueText() const override;
 
-	bool Interact(PlayerCard &player) override;
+	InteractionResult Interact(PlayerCard &player) override;
 	void AutoAction(PlayerCard &player) override;
 
 	Color color;

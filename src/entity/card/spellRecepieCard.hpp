@@ -13,7 +13,7 @@ class SpellRecepieCard : public Card {
 
 	[[nodiscard]] std::string GetValueText() const override;
 
-	bool Interact(PlayerCard &player) override;
+	InteractionResult Interact(PlayerCard &player) override;
 	void AutoAction(PlayerCard &player) override {};
 
 	std::shared_ptr<Spell> spell;

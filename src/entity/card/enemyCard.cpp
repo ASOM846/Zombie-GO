@@ -1,6 +1,8 @@
 #include "enemyCard.hpp"
+#include "card.hpp"
+#include "coinCard.hpp"
 #include "playerCard.hpp"
-#include "weaponCard.hpp"
+#include <memory>
 #include <vector>
 
 EnemyCard::EnemyCard() {
@@ -27,8 +29,9 @@ std::string EnemyCard::GetValueText() const {
 	return std::to_string(hp);
 }
 
-bool EnemyCard::Interact(PlayerCard &player) {
+InteractionResult EnemyCard::Interact(PlayerCard &player) {
 	int playerDmg = 0;
+	int startHp = hp;
 
 	if (player.currentWeapon && player.currentWeapon->attack > 0) {
 		playerDmg = player.currentWeapon->attack;
@@ -51,8 +54,9 @@ bool EnemyCard::Interact(PlayerCard &player) {
 	}
 
 	if (hp > 0) {
-		return false;
+		return {.replace = false, .replaceInto = nullptr};
 	}
 
-	return true;
+	return {.replace = true,
+			.replaceInto = std::make_shared<CoinCard>(startHp)};
 }

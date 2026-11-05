@@ -1,5 +1,6 @@
 #include "spellRecepieCard.hpp"
 #include "../spell/spell.hpp"
+#include "card.hpp"
 #include "playerCard.hpp"
 
 #include <functional>
@@ -42,7 +43,8 @@ std::string SpellRecepieCard::GetValueText() const {
 	return spell->name;
 }
 
-bool SpellRecepieCard::Interact(PlayerCard &player) {
+InteractionResult SpellRecepieCard::Interact(PlayerCard &player) {
 	player.spells.push_back(spell);
-	return true;
+
+	return {.replace = true, .replaceInto = nullptr};
 }

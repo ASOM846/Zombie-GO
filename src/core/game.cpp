@@ -146,6 +146,9 @@ void Game::Render() {
 	// 	DrawText("SPELL NOT SELECTED", 100, 300, 30, GREEN);
 	// }
 
+	DrawText(std::to_string(board.GetPlayer()->coins).c_str(),
+			 GetScreenWidth() / 2, 40, 30, GOLD);
+
 	if (board.GetPlayer()->hp <= 0) {
 		RenderLose();
 	}

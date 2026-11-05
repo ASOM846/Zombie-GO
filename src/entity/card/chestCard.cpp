@@ -1,4 +1,6 @@
 #include "chestCard.hpp"
+#include "card.hpp"
+#include "coinCard.hpp"
 
 ChestCard::ChestCard() {
 	name = "CHEST";
@@ -12,6 +14,6 @@ std::string ChestCard::GetValueText() const {
 	return "";
 }
 
-bool ChestCard::Interact(PlayerCard &player) {
-	return false;
+InteractionResult ChestCard::Interact(PlayerCard &player) {
+	return {.replace = true, .replaceInto = std::make_shared<CoinCard>()};
 }

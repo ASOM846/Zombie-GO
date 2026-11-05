@@ -1,4 +1,5 @@
 #include "playerCard.hpp"
+#include "card.hpp"
 
 PlayerCard::PlayerCard() {
 	name = "PLAYER";
@@ -26,6 +27,6 @@ std::string PlayerCard::GetValueText() const {
 	return std::string{std::to_string(hp) + "/" + std::to_string(maxHp)};
 }
 
-bool PlayerCard::Interact(PlayerCard &player) {
-	return true;
+InteractionResult PlayerCard::Interact(PlayerCard &player) {
+	return {.replace = true, .replaceInto = nullptr};
 }

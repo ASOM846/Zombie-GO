@@ -2,6 +2,7 @@
 
 #include "../../textureManager.hpp"
 
+#include <memory>
 #include <raylib.h>
 #include <string>
 
@@ -9,6 +10,12 @@ class Spell;
 
 class PlayerCard;
 class SwordCard;
+class Card;
+
+struct InteractionResult {
+	bool replace;
+	std::shared_ptr<Card> replaceInto;
+};
 
 class Card {
   public:
@@ -24,7 +31,7 @@ class Card {
 							   TextureManager &tm) = 0;
 
   public:
-	virtual bool Interact(PlayerCard &player) = 0;
+	virtual InteractionResult Interact(PlayerCard &player) = 0;
 	virtual void AutoAction(PlayerCard &player) = 0;
 
 	Vector2 renderPos{0, 0};

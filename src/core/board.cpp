@@ -117,7 +117,21 @@ void Board::HandleSwipeDown() {
 	}
 
 	if (target != nullptr) {
-		if (!target->Interact(*player)) {
+		// if (!target->Interact(*player).replace) {
+		// 	return;
+		// }
+		InteractionResult result = target->Interact(*player);
+
+		// true i nullptr - usunięcie
+		// false i nullptr - brak reakcji
+		// false i ptr - zamiana w zapisana
+
+		if ((result.replace == false) && (result.replaceInto == nullptr)) {
+			return;
+		}
+
+		if ((result.replace == true) && (result.replaceInto != nullptr)) {
+			board[targetY][playerPos.x] = result.replaceInto;
 			return;
 		}
 	}
@@ -145,13 +159,22 @@ void Board::HandleSwipeUp() {
 
 	auto target = board[targetY][playerPos.x];
 
-	if (std::dynamic_pointer_cast<ChestCard>(target) != nullptr) {
-		board[targetY][playerPos.x] = std::make_shared<CoinCard>();
-		return;
-	}
-
 	if (target != nullptr) {
-		if (!target->Interact(*player)) {
+		// if (!target->Interact(*player).replace) {
+		// 	return;
+		// }
+		InteractionResult result = target->Interact(*player);
+
+		// true i nullptr - usunięcie
+		// false i nullptr - brak reakcji
+		// false i ptr - zamiana w zapisana
+
+		if ((result.replace == false) && (result.replaceInto == nullptr)) {
+			return;
+		}
+
+		if ((result.replace == true) && (result.replaceInto != nullptr)) {
+			board[targetY][playerPos.x] = result.replaceInto;
 			return;
 		}
 	}
@@ -179,18 +202,27 @@ void Board::HandleSwipeLeft() {
 
 	auto target = board[playerPos.y][targetX];
 
-	if (std::dynamic_pointer_cast<ChestCard>(target) != nullptr) {
-		board[playerPos.y][targetX] = std::make_shared<CoinCard>();
-		return;
-	}
-
-	auto enemy = std::dynamic_pointer_cast<EnemyCard>(target);
-
 	if (target != nullptr) {
-		if (!target->Interact(*player)) {
+		// if (!target->Interact(*player).replace) {
+		// 	return;
+		// }
+		InteractionResult result = target->Interact(*player);
+
+		// true i nullptr - usunięcie
+		// false i nullptr - brak reakcji
+		// false i ptr - zamiana w zapisana
+
+		if ((result.replace == false) && (result.replaceInto == nullptr)) {
+			return;
+		}
+
+		if ((result.replace == true) && (result.replaceInto != nullptr)) {
+			board[playerPos.y][targetX] = result.replaceInto;
 			return;
 		}
 	}
+
+	auto enemy = std::dynamic_pointer_cast<EnemyCard>(target);
 
 	board[playerPos.y][targetX] = board[playerPos.y][playerPos.x];
 
@@ -215,13 +247,19 @@ void Board::HandleSwipeRight() {
 
 	auto target = board[playerPos.y][targetX];
 
-	if (std::dynamic_pointer_cast<ChestCard>(target) != nullptr) {
-		board[playerPos.y][targetX] = std::make_shared<CoinCard>();
-		return;
-	}
-
 	if (target != nullptr) {
-		if (!target->Interact(*player)) {
+		InteractionResult result = target->Interact(*player);
+
+		// true i nullptr - usunięcie
+		// false i nullptr - brak reakcji
+		// false i ptr - zamiana w zapisana
+
+		if ((result.replace == false) && (result.replaceInto == nullptr)) {
+			return;
+		}
+
+		if ((result.replace == true) && (result.replaceInto != nullptr)) {
+			board[playerPos.y][targetX] = result.replaceInto;
 			return;
 		}
 	}

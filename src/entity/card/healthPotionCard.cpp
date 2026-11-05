@@ -1,4 +1,5 @@
 #include "healthPotionCard.hpp"
+#include "card.hpp"
 #include "playerCard.hpp"
 
 HealthPotionCard::HealthPotionCard() {
@@ -14,10 +15,10 @@ std::string HealthPotionCard::GetValueText() const {
 	return std::to_string(amount);
 }
 
-bool HealthPotionCard::Interact(PlayerCard &player) {
+InteractionResult HealthPotionCard::Interact(PlayerCard &player) {
 	player.hp += amount;
 
 	player.hp = std::min(player.hp, player.maxHp);
 
-	return true;
+	return {.replace = true, .replaceInto = nullptr};
 }

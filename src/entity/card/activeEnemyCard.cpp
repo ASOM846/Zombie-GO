@@ -1,4 +1,6 @@
 #include "activeEnemyCard.hpp"
+#include "card.hpp"
+#include "coinCard.hpp"
 #include "playerCard.hpp"
 
 ActiveEnemyCard::ActiveEnemyCard() {
@@ -24,7 +26,7 @@ std::string ActiveEnemyCard::GetValueText() const {
 	return std::to_string(hp);
 }
 
-bool ActiveEnemyCard::Interact(PlayerCard &player) {
+InteractionResult ActiveEnemyCard::Interact(PlayerCard &player) {
 	int playerDmg = 0;
 
 	if (player.currentWeapon && player.currentWeapon->attack > 0) {
@@ -48,10 +50,10 @@ bool ActiveEnemyCard::Interact(PlayerCard &player) {
 	}
 
 	if (hp > 0) {
-		return false;
+		return {.replace = false, .replaceInto = nullptr};
 	}
 
-	return true;
+	return {.replace = true, .replaceInto = std::make_shared<CoinCard>()};
 }
 
 void ActiveEnemyCard::AutoAction(PlayerCard &player) {

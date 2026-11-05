@@ -1,9 +1,16 @@
 #include "coinCard.hpp"
+#include "card.hpp"
 #include "playerCard.hpp"
 
 CoinCard::CoinCard() {
 	name = "COIN";
 	value = GetRandomValue(2, 12);
+	textureId = TextureId::COIN_0;
+}
+
+CoinCard::CoinCard(int p_value) {
+	name = "COIN";
+	value = p_value;
 	textureId = TextureId::COIN_0;
 }
 
@@ -14,7 +21,8 @@ std::string CoinCard::GetValueText() const {
 	return std::to_string(value);
 }
 
-bool CoinCard::Interact(PlayerCard &player) {
+InteractionResult CoinCard::Interact(PlayerCard &player) {
 	player.coins += value;
-	return true;
+
+	return {.replace = true, .replaceInto = nullptr};
 }

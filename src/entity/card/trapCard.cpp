@@ -1,4 +1,5 @@
 #include "trapCard.hpp"
+#include "card.hpp"
 #include "playerCard.hpp"
 
 TrapCard::TrapCard() {
@@ -14,7 +15,8 @@ std::string TrapCard::GetValueText() const {
 	return std::to_string(attack);
 }
 
-bool TrapCard::Interact(PlayerCard &player) {
+InteractionResult TrapCard::Interact(PlayerCard &player) {
 	player.hp -= attack;
-	return true;
+
+	return {.replace = true, .replaceInto = nullptr};
 }

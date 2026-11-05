@@ -1,4 +1,5 @@
 #include "weaponCard.hpp"
+#include "card.hpp"
 #include "playerCard.hpp"
 
 MeleWeaponCard::MeleWeaponCard() {
@@ -36,8 +37,8 @@ std::string MeleWeaponCard::GetValueText() const {
 	return std::to_string(attack);
 }
 
-bool MeleWeaponCard::Interact(PlayerCard &player) {
+InteractionResult MeleWeaponCard::Interact(PlayerCard &player) {
 	player.currentWeapon = std::make_shared<MeleWeaponCard>(*this);
 
-	return true;
+	return {.replace = true, .replaceInto = nullptr};
 }
