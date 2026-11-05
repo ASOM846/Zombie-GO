@@ -9,13 +9,11 @@ MeleWeaponCard::MeleWeaponCard() {
 	};
 
 	auto GetRandomParms = [this]() {
-		std::vector<WeaponParms> parms{{"SWORD", TextureId::WEAPON_0},
-									   {"AXE", TextureId::WEAPON_1},
-									   {"BATON", TextureId::WEAPON_2},
-									   {"DOUBLE AXE", TextureId::WEAPON_3},
-									   {"HAMMER", TextureId::WEAPON_4},
-									   {"KNIFE", TextureId::WEAPON_5},
-									   {"SAW SWORD", TextureId::WEAPON_6}};
+		std::vector<WeaponParms> parms{
+			{"WRENCH", TextureId::WEAPON_0},  {"AXE", TextureId::WEAPON_1},
+			{"CROWBAR", TextureId::WEAPON_2}, {"MACHETE", TextureId::WEAPON_3},
+			{"PAN", TextureId::WEAPON_4},	  {"SICKLE", TextureId::WEAPON_5},
+			{"KNIFE", TextureId::WEAPON_6}};
 
 		int seed = GetRandomValue(0, parms.size() - 1);
 
