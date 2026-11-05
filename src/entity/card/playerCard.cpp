@@ -1,14 +1,15 @@
 #include "playerCard.hpp"
+
+#include "../../graphics/floatingText.hpp"
 #include "card.hpp"
+#include <raylib.h>
 
 PlayerCard::PlayerCard() {
 	name = "SURVIVOR";
 
 	currentWeapon = std::make_shared<MeleWeaponCard>();
-	currentWeapon->name = "SWORD";
-	currentWeapon->attack = 5;
 
-	maxHp = 12;
+	maxHp = 10;
 
 	hp = maxHp;
 	coins = 0;
@@ -29,4 +30,12 @@ std::string PlayerCard::GetValueText() const {
 
 InteractionResult PlayerCard::Interact(PlayerCard &player) {
 	return {.replace = true, .replaceInto = nullptr};
+}
+
+void PlayerCard::CollectCoin(int value) {
+	coins += value;
+
+	EffectManager::Get().SpawnText(
+		{static_cast<float>(GetScreenWidth() / 2), 40},
+		"+" + std::to_string(value), DARKGREEN);
 }

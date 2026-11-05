@@ -3,7 +3,6 @@
 #include "../entity/card/chestCard.hpp"
 #include "../entity/card/coinCard.hpp"
 #include "../entity/card/enemyCard.hpp"
-#include "../entity/card/healthPotionCard.hpp"
 #include "../entity/card/playerCard.hpp"
 #include "../entity/card/spellRecepieCard.hpp"
 #include "../entity/card/trapCard.hpp"
@@ -34,15 +33,15 @@ void Board::Reset() {
 void Board::Update(ScreenShake &ss) {
 	float dt = GetFrameTime();
 
-	Vector2 cellSize = {static_cast<float>(cellWidth),
-						static_cast<float>(cellHeight)};
+	Vector2 cellSize = {static_cast<float>(gfx::cellWidth),
+						static_cast<float>(gfx::cellHeight)};
 
 	for (int y = 0; y < boardY; y++) {
 		for (int x = 0; x < boardX; x++) {
 			auto &card = board[y][x];
 
-			Vector2 target{boardOffset.x + (cellWidth + spacing) * x,
-						   boardOffset.y + (cellHeight + spacing) * y};
+			Vector2 target{boardOffset.x + (gfx::cellWidth + spacing) * x,
+						   boardOffset.y + (gfx::cellHeight + spacing) * y};
 
 			card->SetTargetPos(target);
 			card->UpdateAnimation(dt);
@@ -58,7 +57,7 @@ void Board::OnActionUpdate(ScreenShake &ss) {
 	}
 }
 
-void Board::UpdateHighlights(std::shared_ptr<Spell> selectedSpell) {
+void Board::UpdateHighlights(std::shared_ptr<Pickable> selectedPickable) {
 	for (int y = 0; y < boardY; y++) {
 		for (int x = 0; x < boardX; x++) {
 			auto &card = board[y][x];
@@ -66,10 +65,12 @@ void Board::UpdateHighlights(std::shared_ptr<Spell> selectedSpell) {
 				continue;
 			}
 
-			if (selectedSpell != nullptr) {
-				card->isHighlited = selectedSpell->ShouldHighlight(card);
+			if (selectedPickable != nullptr) {
+				card->isHighlited = selectedPickable->ShouldHighlight(card);
+				card->highlightColor = selectedPickable->highlightColor;
 			} else {
 				card->isHighlited = false;
+				card->highlightColor = BLANK;
 			}
 		}
 	}
@@ -77,20 +78,20 @@ void Board::UpdateHighlights(std::shared_ptr<Spell> selectedSpell) {
 
 void Board::Render(TextureManager &tm) {
 	Vector2 offset{
-		static_cast<float>(
-			(GetScreenWidth() - (cellWidth * boardX + spacing * (boardX - 1))) /
-			2),
-		static_cast<float>((GetScreenHeight() -
-							(cellHeight * boardY + spacing * (boardY - 1))) /
+		static_cast<float>((GetScreenWidth() - (gfx::cellWidth * boardX +
+												spacing * (boardX - 1))) /
+						   2),
+		static_cast<float>((GetScreenHeight() - (gfx::cellHeight * boardY +
+												 spacing * (boardY - 1))) /
 						   2)};
 
 	for (int y = 0; y < boardY; y++) {
 		for (int x = 0; x < boardX; x++) {
-			Vector2 finalPos = {offset.x + ((cellWidth + spacing) * x),
-								offset.y + ((cellHeight + spacing) * y)};
+			Vector2 finalPos = {offset.x + ((gfx::cellWidth + spacing) * x),
+								offset.y + ((gfx::cellHeight + spacing) * y)};
 
-			Vector2 cellSize = {static_cast<float>(cellWidth),
-								static_cast<float>(cellHeight)};
+			Vector2 cellSize = {static_cast<float>(gfx::cellWidth),
+								static_cast<float>(gfx::cellHeight)};
 
 			board[y][x]->Render(board[y][x]->renderPos, cellSize, tm);
 		}
@@ -299,20 +300,20 @@ Vector2 Board::GetPlayerPos() {
 
 std::shared_ptr<Card> Board::GetCellAtPosition(Vector2 posistion) {
 	Vector2 offset{
-		static_cast<float>(
-			(GetScreenWidth() - (cellWidth * boardX + spacing * (boardX - 1))) /
-			2),
-		static_cast<float>((GetScreenHeight() -
-							(cellHeight * boardY + spacing * (boardY - 1))) /
+		static_cast<float>((GetScreenWidth() - (gfx::cellWidth * boardX +
+												spacing * (boardX - 1))) /
+						   2),
+		static_cast<float>((GetScreenHeight() - (gfx::cellHeight * boardY +
+												 spacing * (boardY - 1))) /
 						   2)};
 
 	for (int y = 0; y < boardY; y++) {
 		for (int x = 0; x < boardX; x++) {
-			Vector2 finalPos = {offset.x + ((cellWidth + spacing) * x),
-								offset.y + ((cellHeight + spacing) * y)};
+			Vector2 finalPos = {offset.x + ((gfx::cellWidth + spacing) * x),
+								offset.y + ((gfx::cellHeight + spacing) * y)};
 
-			Vector2 cellSize = {static_cast<float>(cellWidth),
-								static_cast<float>(cellHeight)};
+			Vector2 cellSize = {static_cast<float>(gfx::cellWidth),
+								static_cast<float>(gfx::cellHeight)};
 
 			Rectangle rect{finalPos.x, finalPos.y, cellSize.x, cellSize.y};
 
@@ -329,12 +330,11 @@ std::shared_ptr<Card> Board::GetRandomCard() {
 	std::vector<std::pair<int, std::function<std::shared_ptr<Card>()>>>
 		weightedPool = {
 			{60, []() { return std::make_shared<EnemyCard>(); }},
-			{15, []() { return std::make_shared<TrapCard>(); }},
+			{10, []() { return std::make_shared<TrapCard>(); }},
 			{10, []() { return std::make_shared<ActiveEnemyCard>(); }},
-			{10, []() { return std::make_shared<HealthPotionCard>(); }},
-			{10, []() { return std::make_shared<SpellRecepieCard>(); }},
+			{15, []() { return std::make_shared<SpellRecepieCard>(); }},
 			{10, []() { return std::make_shared<ChestCard>(); }},
-			{10, []() { return std::make_shared<MeleWeaponCard>(); }}};
+			{15, []() { return std::make_shared<MeleWeaponCard>(); }}};
 
 	int totalWeight = 0;
 	for (const auto &entry : weightedPool) {
@@ -371,20 +371,22 @@ void Board::RecalculateDrawindVariables(int bottomButtonsHeight) {
 		(static_cast<int>(touchRec.width) - (spacing * boardX + 1)) / boardX;
 	int maxCellHeight;
 
-	cellWidth = maxCellWidth;
-	cellHeight = maxCellWidth * 1.333333f;
+	gfx::cellWidth = maxCellWidth;
+	gfx::cellHeight = maxCellWidth * 1.333333f;
 
-	if ((cellHeight * boardY + (boardY + 1) * spacing) >= touchRec.height) {
+	if ((gfx::cellHeight * boardY + (boardY + 1) * spacing) >=
+		touchRec.height) {
 		maxCellHeight =
 			(static_cast<int>(touchRec.height) - (spacing * boardY + 1)) /
 			boardY;
 
-		cellWidth = maxCellHeight * 0.755555f;
-		cellHeight = maxCellHeight;
+		gfx::cellWidth = maxCellHeight * 0.755555f;
+		gfx::cellHeight = maxCellHeight;
 	}
 
-	float totalBoardWidth = (cellWidth * boardX + spacing * (boardX - 1));
-	float totalBoardHeight = (cellHeight * boardY + spacing * (boardY - 1));
+	float totalBoardWidth = (gfx::cellWidth * boardX + spacing * (boardX - 1));
+	float totalBoardHeight =
+		(gfx::cellHeight * boardY + spacing * (boardY - 1));
 
 	boardOffset = {.x = touchRec.x + (touchRec.width - totalBoardWidth) / 2.0f,
 				   .y = touchRec.y +

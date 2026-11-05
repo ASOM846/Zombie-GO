@@ -3,6 +3,8 @@
 #include "card.hpp"
 #include <memory>
 
+class Pickable;
+
 class SpellRecepieCard : public Card {
   public:
 	SpellRecepieCard();
@@ -16,5 +18,5 @@ class SpellRecepieCard : public Card {
 	InteractionResult Interact(PlayerCard &player) override;
 	void AutoAction(PlayerCard &player) override {};
 
-	std::shared_ptr<Spell> spell;
+	std::shared_ptr<Pickable> pickable;
 };

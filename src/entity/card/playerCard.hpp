@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+class Pickable;
+
 class PlayerCard : public Card {
   public:
 	PlayerCard();
@@ -18,9 +20,11 @@ class PlayerCard : public Card {
 	InteractionResult Interact(PlayerCard &player) override;
 	void AutoAction(PlayerCard &player) override {};
 
+	void CollectCoin(int value);
+
 	std::shared_ptr<MeleWeaponCard> currentWeapon;
 
-	std::vector<std::shared_ptr<Spell>> spells;
+	std::vector<std::shared_ptr<Pickable>> pickables;
 
 	int maxHp;
 

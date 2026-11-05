@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gfx.hpp"
 #include <algorithm>
 #include <cctype>
 #include <raylib.h>
@@ -21,9 +22,16 @@ struct FloatingText {
 class EffectManager {
   private:
 	std::vector<FloatingText> activeTexts;
+	EffectManager() = default;
 
   public:
-	EffectManager() = default;
+	static EffectManager &Get() {
+		static EffectManager instance;
+		return instance;
+	}
+
+	EffectManager(const EffectManager &) = delete;
+	EffectManager &operator=(const EffectManager &) = delete;
 
 	void Reset() { activeTexts.clear(); }
 
@@ -98,7 +106,8 @@ class EffectManager {
 
 			DrawText(ft.text.c_str(), static_cast<int>(ft.position.x),
 					 static_cast<int>(ft.position.y),
-					 static_cast<int>(ft.currentSize), finalColor);
+					 static_cast<int>(ft.currentSize) * gfx::userFontScale,
+					 finalColor);
 		}
 	}
 };

@@ -2,6 +2,7 @@
 
 #include <raylib.h>
 
+#include "../graphics/floatingText.hpp"
 #include "../graphics/screenShake.hpp"
 #include "../textureManager.hpp"
 #include "board.hpp"
@@ -45,7 +46,7 @@ class Game {
 	Button spellsButton;
 	Button goBackButton;
 
-	std::shared_ptr<Spell> selectedSpell{nullptr};
+	std::shared_ptr<Pickable> selectedSpell{nullptr};
 
 	bool wasActionTaken;
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <raylib.h>
-#include <vector>
 
 #include "../entity/card/card.hpp"
 #include "../entity/spell/spell.hpp"
@@ -11,7 +10,7 @@ class SpellPage {
 	void Init();
 	void Reset();
 
-	std::shared_ptr<Spell> UpdateAndGetSelected(PlayerCard &player);
+	std::shared_ptr<Pickable> UpdateAndGetSelected(PlayerCard &player);
 	void Render(PlayerCard &player);
 
 	int width{500};

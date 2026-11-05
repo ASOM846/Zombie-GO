@@ -14,7 +14,9 @@ enum class TextureId {
 
 	TRAP_0,
 
-	CHEST_0,
+	MOLOTOW_0,
+
+	MEDKIT_0,
 
 	CRATE_0,
 
@@ -65,7 +67,9 @@ class TextureManager {
 
 		load(TextureId::TRAP_0, "assets/trap0.png");
 
-		load(TextureId::CHEST_0, "assets/chest0.png");
+		load(TextureId::MOLOTOW_0, "assets/molotow0.png");
+
+		load(TextureId::MEDKIT_0, "assets/medkit0.png");
 
 		load(TextureId::CRATE_0, "assets/crate0.png");
 

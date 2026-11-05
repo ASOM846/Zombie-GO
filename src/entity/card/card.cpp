@@ -1,7 +1,9 @@
 #include "card.hpp"
+#include <algorithm>
 #include <cmath>
 #include <raylib.h>
 
+#include "../../graphics/floatingText.hpp"
 #include "../../graphics/gfx.hpp"
 
 void Card::Render(Vector2 position, Vector2 cellSize, TextureManager &tm) {
@@ -18,6 +20,15 @@ void Card::Render(Vector2 position, Vector2 cellSize, TextureManager &tm) {
 
 	Vector2 contentPos = transform(position.x, position.y);
 	RenderContent(contentPos, {cellSize.x * scale, cellSize.y * scale}, tm);
+}
+
+void Card::TakeDamage(int value) {
+	hp -= value;
+	hp = std::max(hp, 0);
+
+	EffectManager::Get().SpawnText(
+		{renderPos.x + gfx::cellWidth / 2, renderPos.y + gfx::cellHeight / 2},
+		std::to_string(value).c_str(), RED);
 }
 
 void Card::SetTargetPos(Vector2 target) {

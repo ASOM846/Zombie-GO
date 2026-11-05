@@ -7,7 +7,7 @@
 #include "../card/enemyCard.hpp"
 #include "../card/playerCard.hpp"
 
-void Spell::Render(Vector2 position, Vector2 size) {
+void Pickable::Render(Vector2 position, Vector2 size) {
 	float centerX = position.x + size.x / 2.0f;
 	float centerY = position.y + size.y / 2.0f;
 
@@ -110,16 +110,18 @@ void Spell::Render(Vector2 position, Vector2 size) {
 	RenderContent(position, size);
 }
 
-HealSpell::HealSpell() {
+MedkidPickable::MedkidPickable() {
 	healAmount = 5;
-	name = "HEAL 5";
+	name = "MEDKIT 5";
+	highlightColor = {105, 130, 65, 180};
+	textureId = TextureId::MEDKIT_0;
 }
 
-void HealSpell::RenderContent(Vector2 offset, Vector2 size) {
-	DrawText("HEAL  5", offset.x + 10, offset.y + 10, 20, RED);
+void MedkidPickable::RenderContent(Vector2 offset, Vector2 size) {
+	DrawText("MEDKIT 5", offset.x + 10, offset.y + 10, 20, RED);
 }
 
-bool HealSpell::Interact(std::shared_ptr<Card> target) {
+bool MedkidPickable::Interact(std::shared_ptr<Card> target) {
 
 	if (auto playerTarget = std::dynamic_pointer_cast<PlayerCard>(target)) {
 		playerTarget->hp += healAmount;
@@ -134,7 +136,7 @@ bool HealSpell::Interact(std::shared_ptr<Card> target) {
 	return false;
 }
 
-bool HealSpell::ShouldHighlight(std::shared_ptr<Card> &target) {
+bool MedkidPickable::ShouldHighlight(std::shared_ptr<Card> &target) {
 	if (auto playerTarget = std::dynamic_pointer_cast<PlayerCard>(target)) {
 		return true;
 	}
@@ -146,16 +148,18 @@ bool HealSpell::ShouldHighlight(std::shared_ptr<Card> &target) {
 	return false;
 }
 
-DamageSpell::DamageSpell() {
+MolotowPickable::MolotowPickable() {
 	damageAmount = 5;
-	name = "DAMAGE 5";
+	name = "MOLOTOW 5";
+	highlightColor = {135, 65, 65, 180};
+	textureId = TextureId::MOLOTOW_0;
 }
 
-void DamageSpell::RenderContent(Vector2 offset, Vector2 size) {
+void MolotowPickable::RenderContent(Vector2 offset, Vector2 size) {
 	DrawText("DAMAGE  5", offset.x + 10, offset.y + 10, 20, RED);
 }
 
-bool DamageSpell::Interact(std::shared_ptr<Card> target) {
+bool MolotowPickable::Interact(std::shared_ptr<Card> target) {
 	if (auto playerTarget = std::dynamic_pointer_cast<PlayerCard>(target)) {
 		playerTarget->hp -= damageAmount;
 		return true;
@@ -174,7 +178,7 @@ bool DamageSpell::Interact(std::shared_ptr<Card> target) {
 	return false;
 }
 
-bool DamageSpell::ShouldHighlight(std::shared_ptr<Card> &target) {
+bool MolotowPickable::ShouldHighlight(std::shared_ptr<Card> &target) {
 	if (auto playerTarget = std::dynamic_pointer_cast<PlayerCard>(target)) {
 		return true;
 	}

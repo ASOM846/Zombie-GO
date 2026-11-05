@@ -30,6 +30,8 @@ void Game::Update() {
 	board.RecalculateDrawindVariables(spellsButton.rect.height);
 	screenShake.update(GetFrameTime());
 
+	EffectManager::Get().Update(GetFrameTime());
+
 	gestureInput.Update();
 
 	UpdateButtonPos();
@@ -103,7 +105,7 @@ void Game::Update() {
 
 			if (target != nullptr && selectedSpell != nullptr) {
 				if (selectedSpell->Interact(target)) {
-					auto &spells = board.GetPlayer()->spells;
+					auto &spells = board.GetPlayer()->pickables;
 
 					auto it =
 						std::find(spells.begin(), spells.end(), selectedSpell);
@@ -146,8 +148,10 @@ void Game::Render() {
 	// 	DrawText("SPELL NOT SELECTED", 100, 300, 30, GREEN);
 	// }
 
+	EffectManager::Get().Draw();
+
 	DrawText(std::to_string(board.GetPlayer()->coins).c_str(),
-			 GetScreenWidth() / 2, 40, 30, GOLD);
+			 GetScreenWidth() / 2, 40, 45, DARKGREEN);
 
 	if (board.GetPlayer()->hp <= 0) {
 		RenderLose();
@@ -178,7 +182,7 @@ void Game::RenderLose() {
 }
 
 void Game::UpdateButtonPos() {
-	int btnWidth = board.GetCellWidth();
+	int btnWidth = gfx::cellWidth;
 	int btnHeight = 50 * gfx::userFontScale;
 
 	spellsButton.rect = {

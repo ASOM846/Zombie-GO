@@ -22,7 +22,7 @@ std::string CoinCard::GetValueText() const {
 }
 
 InteractionResult CoinCard::Interact(PlayerCard &player) {
-	player.coins += value;
+	player.CollectCoin(value);
 
 	return {.replace = true, .replaceInto = nullptr};
 }

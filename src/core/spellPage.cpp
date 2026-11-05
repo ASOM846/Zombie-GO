@@ -8,7 +8,7 @@ void SpellPage::Init() {
 
 void SpellPage::Reset() {}
 
-std::shared_ptr<Spell> SpellPage::UpdateAndGetSelected(PlayerCard &player) {
+std::shared_ptr<Pickable> SpellPage::UpdateAndGetSelected(PlayerCard &player) {
 	UpdatePosition();
 
 	Vector2 mousePos = GetMousePosition();
@@ -18,7 +18,7 @@ std::shared_ptr<Spell> SpellPage::UpdateAndGetSelected(PlayerCard &player) {
 	Vector2 size{static_cast<float>(width), 150};
 
 	int idx = 0;
-	for (auto &spell : player.spells) {
+	for (auto &pickable : player.pickables) {
 
 		Vector2 finalPos{offset.x, offset.y + idx * size.y};
 
@@ -26,7 +26,7 @@ std::shared_ptr<Spell> SpellPage::UpdateAndGetSelected(PlayerCard &player) {
 
 		if (CheckCollisionPointRec(mousePos, spellRect) &&
 			IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-			return player.spells[idx];
+			return player.pickables[idx];
 		}
 
 		idx++;
@@ -43,11 +43,11 @@ void SpellPage::Render(PlayerCard &player) {
 	Vector2 size{static_cast<float>(width), 150};
 
 	int idx = 0;
-	for (auto &spell : player.spells) {
+	for (auto &pickable : player.pickables) {
 
 		Vector2 finalPos{offset.x, offset.y + idx * size.y};
 
-		spell->Render(finalPos, size);
+		pickable->Render(finalPos, size);
 
 		idx++;
 	}

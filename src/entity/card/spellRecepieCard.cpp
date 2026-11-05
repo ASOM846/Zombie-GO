@@ -10,10 +10,10 @@ SpellRecepieCard::SpellRecepieCard() {
 	name = "SPELL";
 
 	auto GetRandomSpell = []() {
-		std::vector<std::pair<int, std::function<std::shared_ptr<Spell>()>>>
+		std::vector<std::pair<int, std::function<std::shared_ptr<Pickable>()>>>
 			weightedPool = {
-				{60, []() { return std::make_shared<HealSpell>(); }},
-				{10, []() { return std::make_shared<DamageSpell>(); }}};
+				{10, []() { return std::make_shared<MedkidPickable>(); }},
+				{10, []() { return std::make_shared<MolotowPickable>(); }}};
 
 		int totalWeight = 0;
 		for (const auto &entry : weightedPool) {
@@ -31,20 +31,20 @@ SpellRecepieCard::SpellRecepieCard() {
 		}
 	};
 
-	spell = GetRandomSpell();
+	pickable = GetRandomSpell();
 
-	textureId = TextureId::CRATE_0;
+	textureId = pickable->textureId;
 }
 
 void SpellRecepieCard::RenderContent(Vector2 offset, Vector2 cellSize,
 									 TextureManager &tm) {}
 
 std::string SpellRecepieCard::GetValueText() const {
-	return spell->name;
+	return pickable->name;
 }
 
 InteractionResult SpellRecepieCard::Interact(PlayerCard &player) {
-	player.spells.push_back(spell);
+	player.pickables.push_back(pickable);
 
 	return {.replace = true, .replaceInto = nullptr};
 }

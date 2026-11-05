@@ -16,7 +16,7 @@ class Board {
 
 	void Update(ScreenShake &ss);
 	void OnActionUpdate(ScreenShake &ss);
-	void UpdateHighlights(std::shared_ptr<Spell> selectedSpell);
+	void UpdateHighlights(std::shared_ptr<Pickable> selectedPickable);
 	void Render(TextureManager &tm);
 
 	void HandleSwipeDown();
@@ -30,7 +30,6 @@ class Board {
 
 	Rectangle const &GetTouchRec() { return touchRec; }
 	int const &GetSpacing() { return spacing; }
-	int const &GetCellWidth() { return cellWidth; }
 
 	void RecalculateDrawindVariables(int bottomButtonsHeight);
 
@@ -47,9 +46,6 @@ class Board {
 
 	const int boardY = 3;
 	const int boardX = 3;
-
-	int cellHeight; //= 266; proportions are 1/3 : 1
-	int cellWidth;	//=200;
 
 	int maxCellWidth;
 

@@ -3,8 +3,8 @@
 #include "coinCard.hpp"
 
 ChestCard::ChestCard() {
-	name = "CHEST";
-	textureId = TextureId::CHEST_0;
+	name = "CRATE";
+	textureId = TextureId::CRATE_0;
 }
 
 void ChestCard::RenderContent(Vector2 offset, Vector2 cellSize,

@@ -34,6 +34,8 @@ class Card {
 	virtual InteractionResult Interact(PlayerCard &player) = 0;
 	virtual void AutoAction(PlayerCard &player) = 0;
 
+	virtual void TakeDamage(int value);
+
 	Vector2 renderPos{0, 0};
 	Vector2 targetPos{0, 0};
 
@@ -54,4 +56,5 @@ class Card {
 	TextureId textureId;
 
 	bool isHighlited{false};
+	Color highlightColor;
 };

@@ -1,8 +1,11 @@
 #include "enemyCard.hpp"
+#include "../../graphics/floatingText.hpp"
+#include "../../graphics/gfx.hpp"
 #include "card.hpp"
 #include "coinCard.hpp"
 #include "playerCard.hpp"
 #include <memory>
+#include <string>
 #include <vector>
 
 EnemyCard::EnemyCard() {
@@ -37,7 +40,7 @@ InteractionResult EnemyCard::Interact(PlayerCard &player) {
 		playerDmg = player.currentWeapon->attack;
 
 		player.currentWeapon->attack -= hp;
-		hp -= playerDmg;
+		TakeDamage(playerDmg);
 
 		if (player.currentWeapon->attack <= 0) {
 			player.currentWeapon->attack = 0;
@@ -47,7 +50,7 @@ InteractionResult EnemyCard::Interact(PlayerCard &player) {
 		playerDmg = player.hp;
 
 		player.hp -= hp;
-		hp -= playerDmg;
+		TakeDamage(playerDmg);
 
 		if (player.hp < 0)
 			player.hp = 0;

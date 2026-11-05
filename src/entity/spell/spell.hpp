@@ -4,12 +4,14 @@
 #include <raylib.h>
 #include <string>
 
+#include "../../textureManager.hpp"
+
 class Card;
 
-class Spell {
+class Pickable {
   public:
-	Spell() = default;
-	virtual ~Spell() = default;
+	Pickable() = default;
+	virtual ~Pickable() = default;
 
 	virtual void Render(Vector2 position, Vector2 size);
 
@@ -19,13 +21,17 @@ class Spell {
   public:
 	virtual bool Interact(std::shared_ptr<Card> target) = 0;
 	virtual bool ShouldHighlight(std::shared_ptr<Card> &target) = 0;
+
 	std::string name;
+
+	Color highlightColor;
+	TextureId textureId;
 };
 
-class HealSpell : public Spell {
+class MedkidPickable : public Pickable {
   public:
-	HealSpell();
-	~HealSpell() override = default;
+	MedkidPickable();
+	~MedkidPickable() override = default;
 
 	void RenderContent(Vector2 offset, Vector2 size) override;
 
@@ -35,10 +41,10 @@ class HealSpell : public Spell {
 	int healAmount;
 };
 
-class DamageSpell : public Spell {
+class MolotowPickable : public Pickable {
   public:
-	DamageSpell();
-	~DamageSpell() override = default;
+	MolotowPickable();
+	~MolotowPickable() override = default;
 
 	void RenderContent(Vector2 offset, Vector2 size) override;
 

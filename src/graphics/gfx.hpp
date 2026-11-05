@@ -10,6 +10,8 @@
 
 namespace gfx {
 inline float userFontScale = 1.00f;
+inline int cellWidth;  //= 266; proportions are 1/3 : 1
+inline int cellHeight; //=200;
 
 inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 						 Vector2 cellSize, TextureManager &tm, Card &card) {
@@ -67,12 +69,18 @@ inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 	// card border
 	drawRect(position.x, position.y, width, height, border);
 
+	if (card.gradientColor.a > 0) {
+		drawRect(position.x, position.y, width, height, card.gradientColor);
+	}
+
 	// Main metal surface
 	drawRect(position.x + 3, position.y + 3, width - 6, height - 6, panel);
 
 	// Highlighted card
 	if (card.isHighlited) {
-		drawRect(position.x, position.y, width, height, {105, 130, 65, 180});
+		// drawRect(position.x, position.y, width, height, {105, 130, 65, 180});
+		drawRect(position.x, position.y, width, height,
+				 ColorAlpha(card.highlightColor, 180));
 	}
 
 	// Card name
