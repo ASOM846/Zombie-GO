@@ -16,6 +16,7 @@ class Menu {
 	void InitButtonsPositions();
 
 	Button startGameButton;
+	Button characterSelectButton;
 
 	Button scaleDownButton;
 	Button scaleUpButton;

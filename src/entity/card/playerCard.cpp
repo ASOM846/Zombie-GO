@@ -2,7 +2,7 @@
 #include "card.hpp"
 
 PlayerCard::PlayerCard() {
-	name = "PLAYER";
+	name = "SURVIVOR";
 
 	currentWeapon = std::make_shared<MeleWeaponCard>();
 	currentWeapon->name = "SWORD";
