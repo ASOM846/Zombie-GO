@@ -11,7 +11,7 @@ class SpellPage {
 	void Reset();
 
 	std::shared_ptr<Pickable> UpdateAndGetSelected(PlayerCard &player);
-	void Render(PlayerCard &player);
+	void Render(PlayerCard &player, TextureManager &tm);
 
 	int width{500};
 	int height{700};

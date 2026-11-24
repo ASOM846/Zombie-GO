@@ -126,7 +126,10 @@ void Game::Update() {
 }
 
 void Game::Render() {
-	Camera2D camera = {{0, 0}, {0, 0}, 0.0F, 1.0F};
+	Camera2D camera = {.offset = {.x = 0, .y = 0},
+					   .target = {.x = 0, .y = 0},
+					   .rotation = 0.0F,
+					   .zoom = 1.0F};
 
 	camera.offset = screenShake.offset;
 	BeginMode2D(camera);
@@ -134,7 +137,7 @@ void Game::Render() {
 	board.Render(textureManager);
 
 	if (currentState == GameState::SPELLS) {
-		spellPage.Render(*board.GetPlayer());
+		spellPage.Render(*board.GetPlayer(), textureManager);
 	}
 
 	EndMode2D();

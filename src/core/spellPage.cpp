@@ -13,16 +13,19 @@ std::shared_ptr<Pickable> SpellPage::UpdateAndGetSelected(PlayerCard &player) {
 
 	Vector2 mousePos = GetMousePosition();
 
-	Vector2 offset{rect.x, rect.y};
+	Vector2 offset{.x = rect.x, .y = rect.y};
 
 	Vector2 size{static_cast<float>(width), 150};
 
 	int idx = 0;
 	for (auto &pickable : player.pickables) {
 
-		Vector2 finalPos{offset.x, offset.y + idx * size.y};
+		Vector2 finalPos{.x = offset.x, .y = offset.y + idx * size.y};
 
-		Rectangle spellRect = {finalPos.x, finalPos.y, size.x, size.y};
+		Rectangle spellRect = {.x = finalPos.x,
+							   .y = finalPos.y,
+							   .width = size.x,
+							   .height = size.y};
 
 		if (CheckCollisionPointRec(mousePos, spellRect) &&
 			IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -35,8 +38,8 @@ std::shared_ptr<Pickable> SpellPage::UpdateAndGetSelected(PlayerCard &player) {
 	return nullptr;
 }
 
-void SpellPage::Render(PlayerCard &player) {
-	DrawRectangleRec(rect, DARKBROWN);
+void SpellPage::Render(PlayerCard &player, TextureManager &tm) {
+	DrawRectangleRec(rect, DARKGRAY);
 
 	Vector2 offset{rect.x, rect.y};
 
@@ -47,7 +50,7 @@ void SpellPage::Render(PlayerCard &player) {
 
 		Vector2 finalPos{offset.x, offset.y + idx * size.y};
 
-		pickable->Render(finalPos, size);
+		pickable->Render(finalPos, size, tm);
 
 		idx++;
 	}

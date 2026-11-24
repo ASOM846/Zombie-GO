@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../entity/card/card.hpp"
+#include "../entity/spell/spell.hpp"
 #include <raylib.h>
 
 #include "../entity/card/playerCard.hpp"
@@ -212,6 +213,77 @@ inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 			DrawTexturePro(weaponTex, weaponSource, weaponDest, {0.0f, 0.0f},
 						   0.0f, RAYWHITE);
 		}
+	}
+}
+
+inline void DrawPickable(const Pickable &pickable, Vector2 position,
+						 Vector2 size, TextureManager &tm) {
+	const float width = size.x;
+	const float height = size.y;
+
+	const Color panel = {56, 62, 64, 255};
+	const Color border = {91, 98, 99, 255};
+	const Color textColor = {210, 212, 208, 255};
+	const Color secondaryText = {165, 170, 170, 255};
+	const Color shadow = {0, 0, 0, 120};
+	const Color spellAccent = {120, 175, 210,
+							   255}; // subtelny akcent dla spelli
+
+	// Cień i ramka spójne z DrawCardBase
+	DrawRectangle(static_cast<int>(position.x + 4),
+				  static_cast<int>(position.y + 5), static_cast<int>(width),
+				  static_cast<int>(height), shadow);
+
+	DrawRectangle(static_cast<int>(position.x), static_cast<int>(position.y),
+				  static_cast<int>(width), static_cast<int>(height), border);
+
+	// Wnętrze panelu
+	DrawRectangle(static_cast<int>(position.x + 3),
+				  static_cast<int>(position.y + 3), static_cast<int>(width - 6),
+				  static_cast<int>(height - 6), panel);
+
+	// Subtelna ramka wewnętrzna odróżniająca podniesiony spell
+	DrawRectangleLinesEx(
+		{position.x + 5.0f, position.y + 5.0f, width - 10.0f, height - 10.0f},
+		1.5f, spellAccent);
+
+	// Nazwa zaklęcia na górze
+	const int fontSize = std::max(1, static_cast<int>(18 * userFontScale));
+	const char *nameText = pickable.name.c_str();
+	const int textWidth = MeasureText(nameText, fontSize);
+	const float textX = position.x + (width - textWidth) * 0.5f;
+	const float textY = position.y + 10.0f * userFontScale;
+
+	DrawText(nameText, static_cast<int>(textX + 1), static_cast<int>(textY + 2),
+			 fontSize, shadow);
+	DrawText(nameText, static_cast<int>(textX), static_cast<int>(textY),
+			 fontSize, textColor);
+
+	// Ikona tekstury spella dopasowana z zachowaniem proporcji
+	const Texture2D &texture = tm.get(pickable.textureId);
+	if (texture.id > 0 && texture.width > 0 && texture.height > 0) {
+		const float topArea = textY + fontSize + 8.0f * userFontScale;
+		const float bottomMargin = 10.0f * userFontScale;
+		const float sidePadding = 12.0f * userFontScale;
+
+		const float availW = std::max(1.0f, width - sidePadding * 2.0f);
+		const float availH =
+			std::max(1.0f, (position.y + height - bottomMargin) - topArea);
+
+		const float texScale =
+			std::min(availW / static_cast<float>(texture.width),
+					 availH / static_cast<float>(texture.height));
+
+		const float drawW = texture.width * texScale;
+		const float drawH = texture.height * texScale;
+		const float drawX = position.x + (width - drawW) * 0.5f;
+		const float drawY = topArea + (availH - drawH) * 0.5f;
+
+		Rectangle src = {0.0f, 0.0f, static_cast<float>(texture.width),
+						 static_cast<float>(texture.height)};
+		Rectangle dst = {drawX, drawY, drawW, drawH};
+
+		DrawTexturePro(texture, src, dst, {0.0f, 0.0f}, 0.0f, RAYWHITE);
 	}
 }
 

@@ -13,7 +13,7 @@ class Pickable {
 	Pickable() = default;
 	virtual ~Pickable() = default;
 
-	virtual void Render(Vector2 position, Vector2 size);
+	virtual void Render(Vector2 position, Vector2 size, TextureManager &tm);
 
   protected:
 	virtual void RenderContent(Vector2 offset, Vector2 size) = 0;
