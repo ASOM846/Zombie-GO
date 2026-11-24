@@ -14,6 +14,7 @@
 #include <functional>
 #include <memory>
 #include <raylib.h>
+#include <raymath.h>
 
 void Board::Init() {
 	board.resize(boardY, std::vector<std::shared_ptr<Card>>(boardX));
@@ -98,155 +99,24 @@ void Board::Render(TextureManager &tm) {
 	}
 }
 
-void Board::HandleSwipeDown() {
+void Board::HandleSwipe(Vector2 direction) {
 	Vector2 playerPos = GetPlayerPos();
+	Vector2 desiredPos = Vector2Add(playerPos, direction);
 
-	if (playerPos.y == boardY - 1) {
+	if (desiredPos.x < 0 || desiredPos.y < 0 || desiredPos.y > boardY ||
+		desiredPos.x > boardX) {
 		return;
 	}
-
-	int targetY = playerPos.y + 1;
 
 	auto player =
 		std::dynamic_pointer_cast<PlayerCard>(board[playerPos.y][playerPos.x]);
 
-	auto target = board[targetY][playerPos.x];
+	auto target = board[desiredPos.y][desiredPos.x];
 
 	if (std::dynamic_pointer_cast<ChestCard>(target) != nullptr) {
-		board[targetY][playerPos.x] = std::make_shared<CoinCard>();
+		board[desiredPos.y][desiredPos.x] = std::make_shared<CoinCard>();
 		return;
 	}
-
-	if (target != nullptr) {
-		// if (!target->Interact(*player).replace) {
-		// 	return;
-		// }
-		InteractionResult result = target->Interact(*player);
-
-		// true i nullptr - usunięcie
-		// false i nullptr - brak reakcji
-		// false i ptr - zamiana w zapisana
-
-		if ((result.replace == false) && (result.replaceInto == nullptr)) {
-			return;
-		}
-
-		if ((result.replace == true) && (result.replaceInto != nullptr)) {
-			board[targetY][playerPos.x] = result.replaceInto;
-			return;
-		}
-	}
-
-	board[targetY][playerPos.x] = board[playerPos.y][playerPos.x];
-
-	for (int y = playerPos.y; y > 0; y--) {
-		board[y][playerPos.x] = board[y - 1][playerPos.x];
-	}
-
-	board[0][playerPos.x] = GetRandomCard();
-}
-
-void Board::HandleSwipeUp() {
-	Vector2 playerPos = GetPlayerPos();
-
-	if (playerPos.y == 0) {
-		return;
-	}
-
-	int targetY = playerPos.y - 1;
-
-	auto player =
-		std::dynamic_pointer_cast<PlayerCard>(board[playerPos.y][playerPos.x]);
-
-	auto target = board[targetY][playerPos.x];
-
-	if (target != nullptr) {
-		// if (!target->Interact(*player).replace) {
-		// 	return;
-		// }
-		InteractionResult result = target->Interact(*player);
-
-		// true i nullptr - usunięcie
-		// false i nullptr - brak reakcji
-		// false i ptr - zamiana w zapisana
-
-		if ((result.replace == false) && (result.replaceInto == nullptr)) {
-			return;
-		}
-
-		if ((result.replace == true) && (result.replaceInto != nullptr)) {
-			board[targetY][playerPos.x] = result.replaceInto;
-			return;
-		}
-	}
-
-	board[targetY][playerPos.x] = board[playerPos.y][playerPos.x];
-
-	for (int y = playerPos.y; y < boardY - 1; y++) {
-		board[y][playerPos.x] = board[y + 1][playerPos.x];
-	}
-
-	board[boardY - 1][playerPos.x] = GetRandomCard();
-}
-
-void Board::HandleSwipeLeft() {
-	Vector2 playerPos = GetPlayerPos();
-
-	if (playerPos.x == 0) {
-		return;
-	}
-
-	int targetX = playerPos.x - 1;
-
-	auto player =
-		std::dynamic_pointer_cast<PlayerCard>(board[playerPos.y][playerPos.x]);
-
-	auto target = board[playerPos.y][targetX];
-
-	if (target != nullptr) {
-		// if (!target->Interact(*player).replace) {
-		// 	return;
-		// }
-		InteractionResult result = target->Interact(*player);
-
-		// true i nullptr - usunięcie
-		// false i nullptr - brak reakcji
-		// false i ptr - zamiana w zapisana
-
-		if ((result.replace == false) && (result.replaceInto == nullptr)) {
-			return;
-		}
-
-		if ((result.replace == true) && (result.replaceInto != nullptr)) {
-			board[playerPos.y][targetX] = result.replaceInto;
-			return;
-		}
-	}
-
-	auto enemy = std::dynamic_pointer_cast<EnemyCard>(target);
-
-	board[playerPos.y][targetX] = board[playerPos.y][playerPos.x];
-
-	for (int x = playerPos.x; x < boardX - 1; x++) {
-		board[playerPos.y][x] = board[playerPos.y][x + 1];
-	}
-
-	board[playerPos.y][boardX - 1] = GetRandomCard();
-}
-
-void Board::HandleSwipeRight() {
-	Vector2 playerPos = GetPlayerPos();
-
-	if (playerPos.x == boardX - 1) {
-		return;
-	}
-
-	int targetX = playerPos.x + 1;
-
-	auto player =
-		std::dynamic_pointer_cast<PlayerCard>(board[playerPos.y][playerPos.x]);
-
-	auto target = board[playerPos.y][targetX];
 
 	if (target != nullptr) {
 		InteractionResult result = target->Interact(*player);
@@ -260,18 +130,38 @@ void Board::HandleSwipeRight() {
 		}
 
 		if ((result.replace == true) && (result.replaceInto != nullptr)) {
-			board[playerPos.y][targetX] = result.replaceInto;
+			board[desiredPos.y][desiredPos.x] = result.replaceInto;
 			return;
 		}
 	}
 
-	board[playerPos.y][targetX] = board[playerPos.y][playerPos.x];
+	board[desiredPos.y][desiredPos.x] = board[playerPos.y][playerPos.x];
 
-	for (int x = playerPos.x; x > 0; x--) {
-		board[playerPos.y][x] = board[playerPos.y][x - 1];
+	if (direction.y == 1) {
+		for (int y = playerPos.y; y > 0; y--) {
+			board[y][playerPos.x] = board[y - 1][playerPos.x];
+		}
+
+		board[0][playerPos.x] = GetRandomCard();
+	} else if (direction.y == -1) {
+		for (int y = playerPos.y; y < boardY - 1; y++) {
+			board[y][playerPos.x] = board[y + 1][playerPos.x];
+		}
+
+		board[boardY - 1][playerPos.x] = GetRandomCard();
+	} else if (direction.x == 1) {
+		for (int x = playerPos.x; x > 0; x--) {
+			board[playerPos.y][x] = board[playerPos.y][x - 1];
+		}
+
+		board[playerPos.y][0] = GetRandomCard();
+	} else {
+		for (int x = playerPos.x; x < boardX - 1; x++) {
+			board[playerPos.y][x] = board[playerPos.y][x + 1];
+		}
+
+		board[playerPos.y][boardX - 1] = GetRandomCard();
 	}
-
-	board[playerPos.y][0] = GetRandomCard();
 }
 
 std::shared_ptr<PlayerCard> Board::GetPlayer() {

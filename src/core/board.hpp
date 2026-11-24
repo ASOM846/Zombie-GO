@@ -19,10 +19,7 @@ class Board {
 	void UpdateHighlights(std::shared_ptr<Pickable> selectedPickable);
 	void Render(TextureManager &tm);
 
-	void HandleSwipeDown();
-	void HandleSwipeUp();
-	void HandleSwipeLeft();
-	void HandleSwipeRight();
+	void HandleSwipe(Vector2 direction);
 
 	std::shared_ptr<PlayerCard> GetPlayer();
 

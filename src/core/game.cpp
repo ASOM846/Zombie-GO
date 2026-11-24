@@ -62,19 +62,19 @@ void Game::Update() {
 				gestureInput.GetLastGestureRecorded()) {
 				switch (gestureInput.GetGestureRecorded()) {
 				case GESTURE_SWIPE_DOWN:
-					board.HandleSwipeDown();
+					board.HandleSwipe({0, 1});
 					wasActionTaken = true;
 					break;
 				case GESTURE_SWIPE_UP:
-					board.HandleSwipeUp();
+					board.HandleSwipe({0, -1});
 					wasActionTaken = true;
 					break;
 				case GESTURE_SWIPE_LEFT:
-					board.HandleSwipeLeft();
+					board.HandleSwipe({-1, 0});
 					wasActionTaken = true;
 					break;
 				case GESTURE_SWIPE_RIGHT:
-					board.HandleSwipeRight();
+					board.HandleSwipe({1, 0});
 					wasActionTaken = true;
 					break;
 				default:
