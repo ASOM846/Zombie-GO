@@ -72,6 +72,7 @@ InteractionResult ActiveEnemyCard::Interact(PlayerCard &player) {
 
 void ActiveEnemyCard::AutoAction(PlayerCard &player) {
 	hp += 1;
-	if (GetRandomValue(1, 2) == 1)
-		player.hp -= 1;
+	if (GetRandomValue(1, 2) == 1) {
+		player.TakeDamage(1);
+	}
 }

@@ -2,7 +2,6 @@
 
 #include "core/game.hpp"
 #include "core/menu.hpp"
-#include "core/ui.hpp"
 #include "graphics/fpsGraph.hpp"
 #include "graphics/gfx.hpp"
 
@@ -43,8 +42,6 @@ int main() {
 
 	Game game;
 	game.Init();
-
-	Ui ui;
 
 	WindowState currentState{WindowState::GAME};
 
@@ -92,7 +89,6 @@ int main() {
 		case WindowState::GAME:
 			game.Render();
 
-			ui.Render(game.GetBoard().GetPlayer());
 			break;
 		case WindowState::MENU:
 			menu.Render();

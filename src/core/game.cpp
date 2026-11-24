@@ -16,12 +16,16 @@ void Game::Init() {
 	goBackButton.text = "<";
 
 	UpdateButtonPos();
+
+	Reset();
 }
 
 void Game::Reset() {
 	currentState = GameState::BOARD;
 	spellPage.Reset();
 	board.Reset();
+	actionsToTake = GetRandomValue(20, 50);
+	actionsTaken = 0;
 }
 
 void Game::Update() {
@@ -37,6 +41,7 @@ void Game::Update() {
 	UpdateButtonPos();
 
 	if (wasActionTaken) {
+		actionsTaken++;
 		board.OnActionUpdate(screenShake);
 		wasActionTaken = false;
 	}
@@ -145,12 +150,6 @@ void Game::Render() {
 	spellsButton.Draw(GetFontDefault());
 	goBackButton.Draw(GetFontDefault());
 
-	// if (selectedSpell) {
-	// 	DrawText(selectedSpell->name.c_str(), 100, 300, 30, GREEN);
-	// } else {
-	// 	DrawText("SPELL NOT SELECTED", 100, 300, 30, GREEN);
-	// }
-
 	EffectManager::Get().Draw();
 
 	DrawText(std::to_string(board.GetPlayer()->coins).c_str(),
@@ -159,6 +158,8 @@ void Game::Render() {
 	if (board.GetPlayer()->hp <= 0) {
 		RenderLose();
 	}
+
+	ui.Render(board.GetPlayer(), actionsTaken, actionsToTake);
 }
 
 void Game::RenderLose() {

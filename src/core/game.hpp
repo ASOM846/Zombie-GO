@@ -9,6 +9,7 @@
 #include "button.hpp"
 #include "gestureInput.hpp"
 #include "spellPage.hpp"
+#include "ui.hpp"
 
 enum class GameState {
 	BOARD,
@@ -50,6 +51,10 @@ class Game {
 
 	bool wasActionTaken;
 
+	Ui ui;
 	TextureManager textureManager;
 	ScreenShake screenShake;
+
+	int actionsToTake;
+	int actionsTaken;
 };

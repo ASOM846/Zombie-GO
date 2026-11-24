@@ -170,7 +170,7 @@ std::shared_ptr<PlayerCard> Board::GetPlayer() {
 }
 
 Vector2 Board::GetPlayerPos() {
-	Vector2 playerPos{-1, -1};
+	Vector2 playerPos{.x = -1, .y = -1};
 
 	for (int y = 0; y < boardY; y++) {
 		for (int x = 0; x < boardX; x++) {
@@ -190,20 +190,20 @@ Vector2 Board::GetPlayerPos() {
 
 std::shared_ptr<Card> Board::GetCellAtPosition(Vector2 posistion) {
 	Vector2 offset{
-		static_cast<float>((GetScreenWidth() - (gfx::cellWidth * boardX +
-												spacing * (boardX - 1))) /
-						   2),
-		static_cast<float>((GetScreenHeight() - (gfx::cellHeight * boardY +
-												 spacing * (boardY - 1))) /
-						   2)};
+		.x = static_cast<float>((GetScreenWidth() - (gfx::cellWidth * boardX +
+													 spacing * (boardX - 1))) /
+								2),
+		.y = static_cast<float>((GetScreenHeight() - (gfx::cellHeight * boardY +
+													  spacing * (boardY - 1))) /
+								2)};
 
 	for (int y = 0; y < boardY; y++) {
 		for (int x = 0; x < boardX; x++) {
 			Vector2 finalPos = {offset.x + ((gfx::cellWidth + spacing) * x),
 								offset.y + ((gfx::cellHeight + spacing) * y)};
 
-			Vector2 cellSize = {static_cast<float>(gfx::cellWidth),
-								static_cast<float>(gfx::cellHeight)};
+			Vector2 cellSize = {.x = static_cast<float>(gfx::cellWidth),
+								.y = static_cast<float>(gfx::cellHeight)};
 
 			Rectangle rect{finalPos.x, finalPos.y, cellSize.x, cellSize.y};
 
