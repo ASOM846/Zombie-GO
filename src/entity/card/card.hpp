@@ -12,9 +12,15 @@ class PlayerCard;
 class SwordCard;
 class Card;
 
+enum class GameEvent {
+	NONE,
+	ADVANCE_ROOM
+};
+
 struct InteractionResult {
 	bool replace;
 	std::shared_ptr<Card> replaceInto;
+	GameEvent event{GameEvent::NONE};
 };
 
 class Card {

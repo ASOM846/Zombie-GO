@@ -9,6 +9,11 @@
 #include "../graphics/screenShake.hpp"
 #include "../textureManager.hpp"
 
+struct BoardActionResult {
+	bool turnConsumed{false};
+	GameEvent event{GameEvent::NONE};
+};
+
 class Board {
   public:
 	void Init();
@@ -19,7 +24,7 @@ class Board {
 	void UpdateHighlights(std::shared_ptr<Pickable> selectedPickable);
 	void Render(TextureManager &tm);
 
-	void HandleSwipe(Vector2 direction);
+	BoardActionResult HandleSwipe(Vector2 direction);
 
 	std::shared_ptr<PlayerCard> GetPlayer();
 

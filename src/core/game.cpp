@@ -1,5 +1,7 @@
 #include "game.hpp"
+#include "board.hpp"
 #include <algorithm>
+#include <iostream>
 #include <memory>
 #include <raylib.h>
 #include <raymath.h>
@@ -24,7 +26,8 @@ void Game::Reset() {
 	currentState = GameState::BOARD;
 	spellPage.Reset();
 	board.Reset();
-	actionsToTake = GetRandomValue(20, 50);
+	// actionsToTake = GetRandomValue(20, 50);
+	actionsToTake = 15;
 	actionsTaken = 0;
 }
 
@@ -65,26 +68,33 @@ void Game::Update() {
 			(gestureInput.GetGestureRecorded() != GESTURE_NONE)) {
 			if (gestureInput.GetGestureRecorded() !=
 				gestureInput.GetLastGestureRecorded()) {
+
+				Vector2 direction{};
+
 				switch (gestureInput.GetGestureRecorded()) {
 				case GESTURE_SWIPE_DOWN:
-					board.HandleSwipe({0, 1});
-					wasActionTaken = true;
+					direction = {.x = 0, .y = 1};
 					break;
 				case GESTURE_SWIPE_UP:
-					board.HandleSwipe({0, -1});
-					wasActionTaken = true;
+					direction = {.x = 0, .y = -1};
 					break;
 				case GESTURE_SWIPE_LEFT:
-					board.HandleSwipe({-1, 0});
-					wasActionTaken = true;
+					direction = {.x = -1, .y = 0};
 					break;
 				case GESTURE_SWIPE_RIGHT:
-					board.HandleSwipe({1, 0});
-					wasActionTaken = true;
+					direction = {.x = 1, .y = 0};
 					break;
 				default:
 					break;
 				}
+
+				BoardActionResult actionResult = board.HandleSwipe(direction);
+				wasActionTaken = actionResult.turnConsumed;
+
+				if (actionResult.event == GameEvent::ADVANCE_ROOM) {
+					board.Reset();
+				}
+
 				screenShake.trigger();
 			}
 		}
@@ -128,6 +138,12 @@ void Game::Update() {
 	case GameState::RETURN_TO_MENU:
 		break;
 	}
+
+	// if (actionsTaken >= actionsToTake) {
+	// 	board.Reset();
+	// 	actionsTaken = 0;
+	// 	actionsToTake = 15;
+	// }
 }
 
 void Game::Render() {

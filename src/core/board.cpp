@@ -3,6 +3,7 @@
 #include "../entity/card/chestCard.hpp"
 #include "../entity/card/coinCard.hpp"
 #include "../entity/card/enemyCard.hpp"
+#include "../entity/card/exitCard.hpp"
 #include "../entity/card/playerCard.hpp"
 #include "../entity/card/spellRecepieCard.hpp"
 #include "../entity/card/trapCard.hpp"
@@ -79,33 +80,34 @@ void Board::UpdateHighlights(std::shared_ptr<Pickable> selectedPickable) {
 
 void Board::Render(TextureManager &tm) {
 	Vector2 offset{
-		static_cast<float>((GetScreenWidth() - (gfx::cellWidth * boardX +
-												spacing * (boardX - 1))) /
-						   2),
-		static_cast<float>((GetScreenHeight() - (gfx::cellHeight * boardY +
-												 spacing * (boardY - 1))) /
-						   2)};
+		.x = static_cast<float>((GetScreenWidth() - (gfx::cellWidth * boardX +
+													 spacing * (boardX - 1))) /
+								2),
+		.y = static_cast<float>((GetScreenHeight() - (gfx::cellHeight * boardY +
+													  spacing * (boardY - 1))) /
+								2)};
 
 	for (int y = 0; y < boardY; y++) {
 		for (int x = 0; x < boardX; x++) {
-			Vector2 finalPos = {offset.x + ((gfx::cellWidth + spacing) * x),
-								offset.y + ((gfx::cellHeight + spacing) * y)};
+			Vector2 finalPos = {
+				.x = offset.x + ((gfx::cellWidth + spacing) * x),
+				.y = offset.y + ((gfx::cellHeight + spacing) * y)};
 
-			Vector2 cellSize = {static_cast<float>(gfx::cellWidth),
-								static_cast<float>(gfx::cellHeight)};
+			Vector2 cellSize = {.x = static_cast<float>(gfx::cellWidth),
+								.y = static_cast<float>(gfx::cellHeight)};
 
 			board[y][x]->Render(board[y][x]->renderPos, cellSize, tm);
 		}
 	}
 }
 
-void Board::HandleSwipe(Vector2 direction) {
+BoardActionResult Board::HandleSwipe(Vector2 direction) {
 	Vector2 playerPos = GetPlayerPos();
 	Vector2 desiredPos = Vector2Add(playerPos, direction);
 
 	if (desiredPos.x < 0 || desiredPos.y < 0 || desiredPos.y > boardY ||
 		desiredPos.x > boardX) {
-		return;
+		return {};
 	}
 
 	auto player =
@@ -113,25 +115,27 @@ void Board::HandleSwipe(Vector2 direction) {
 
 	auto target = board[desiredPos.y][desiredPos.x];
 
+	InteractionResult result;
+
 	if (std::dynamic_pointer_cast<ChestCard>(target) != nullptr) {
 		board[desiredPos.y][desiredPos.x] = std::make_shared<CoinCard>();
-		return;
+		return {true};
 	}
 
 	if (target != nullptr) {
-		InteractionResult result = target->Interact(*player);
+		result = target->Interact(*player);
 
 		// true i nullptr - usunięcie
 		// false i nullptr - brak reakcji
 		// false i ptr - zamiana w zapisana
 
 		if ((result.replace == false) && (result.replaceInto == nullptr)) {
-			return;
+			return {.turnConsumed = true};
 		}
 
 		if ((result.replace == true) && (result.replaceInto != nullptr)) {
 			board[desiredPos.y][desiredPos.x] = result.replaceInto;
-			return;
+			return {.turnConsumed = true};
 		}
 	}
 
@@ -162,6 +166,8 @@ void Board::HandleSwipe(Vector2 direction) {
 
 		board[playerPos.y][boardX - 1] = GetRandomCard();
 	}
+
+	return {.turnConsumed = true, .event = result.event};
 }
 
 std::shared_ptr<PlayerCard> Board::GetPlayer() {
@@ -219,6 +225,7 @@ std::shared_ptr<Card> Board::GetCellAtPosition(Vector2 posistion) {
 std::shared_ptr<Card> Board::GetRandomCard() {
 	std::vector<std::pair<int, std::function<std::shared_ptr<Card>()>>>
 		weightedPool = {
+			{10, []() { return std::make_shared<ExitCard>(); }},
 			{60, []() { return std::make_shared<EnemyCard>(); }},
 			{10, []() { return std::make_shared<TrapCard>(); }},
 			{10, []() { return std::make_shared<ActiveEnemyCard>(); }},
