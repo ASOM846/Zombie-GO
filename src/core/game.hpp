@@ -2,6 +2,7 @@
 
 #include <raylib.h>
 
+#include "../entity/card/exitCard.hpp"
 #include "../graphics/floatingText.hpp"
 #include "../graphics/screenShake.hpp"
 #include "../textureManager.hpp"

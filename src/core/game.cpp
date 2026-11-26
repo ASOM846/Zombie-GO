@@ -139,11 +139,12 @@ void Game::Update() {
 		break;
 	}
 
-	// if (actionsTaken >= actionsToTake) {
-	// 	board.Reset();
-	// 	actionsTaken = 0;
-	// 	actionsToTake = 15;
-	// }
+	if (actionsTaken >= actionsToTake) {
+		actionsTaken = 0;
+		actionsToTake = 15;
+
+		board.SpawnCard(std::make_shared<ExitCard>());
+	}
 }
 
 void Game::Render() {

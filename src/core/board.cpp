@@ -23,9 +23,11 @@ void Board::Init() {
 }
 
 void Board::Reset() {
+	cardsSpawnQueue.clear();
+
 	for (int y = 0; y < boardY; y++) {
 		for (int x = 0; x < boardX; x++) {
-			board[y][x] = GetRandomCard();
+			board[y][x] = GetCardToSpawn();
 		}
 	}
 
@@ -146,28 +148,36 @@ BoardActionResult Board::HandleSwipe(Vector2 direction) {
 			board[y][playerPos.x] = board[y - 1][playerPos.x];
 		}
 
-		board[0][playerPos.x] = GetRandomCard();
+		board[0][playerPos.x] = GetCardToSpawn();
 	} else if (direction.y == -1) {
 		for (int y = playerPos.y; y < boardY - 1; y++) {
 			board[y][playerPos.x] = board[y + 1][playerPos.x];
 		}
 
-		board[boardY - 1][playerPos.x] = GetRandomCard();
+		board[boardY - 1][playerPos.x] = GetCardToSpawn();
 	} else if (direction.x == 1) {
 		for (int x = playerPos.x; x > 0; x--) {
 			board[playerPos.y][x] = board[playerPos.y][x - 1];
 		}
 
-		board[playerPos.y][0] = GetRandomCard();
+		board[playerPos.y][0] = GetCardToSpawn();
 	} else {
 		for (int x = playerPos.x; x < boardX - 1; x++) {
 			board[playerPos.y][x] = board[playerPos.y][x + 1];
 		}
 
-		board[playerPos.y][boardX - 1] = GetRandomCard();
+		board[playerPos.y][boardX - 1] = GetCardToSpawn();
 	}
 
 	return {.turnConsumed = true, .event = result.event};
+}
+
+void Board::SpawnCard(const std::shared_ptr<Card> &cardToSpawn) {
+	if (!cardToSpawn) {
+		return;
+	}
+
+	cardsSpawnQueue.push_back(cardToSpawn);
 }
 
 std::shared_ptr<PlayerCard> Board::GetPlayer() {
@@ -222,10 +232,21 @@ std::shared_ptr<Card> Board::GetCellAtPosition(Vector2 posistion) {
 	return nullptr;
 }
 
+std::shared_ptr<Card> Board::GetCardToSpawn() {
+	std::shared_ptr<Card> cardToSpawn{};
+	if (!cardsSpawnQueue.empty()) {
+		cardToSpawn = cardsSpawnQueue.front();
+		cardsSpawnQueue.pop_front();
+	} else {
+		cardToSpawn = GetRandomCard();
+	}
+
+	return cardToSpawn;
+}
+
 std::shared_ptr<Card> Board::GetRandomCard() {
 	std::vector<std::pair<int, std::function<std::shared_ptr<Card>()>>>
 		weightedPool = {
-			{10, []() { return std::make_shared<ExitCard>(); }},
 			{60, []() { return std::make_shared<EnemyCard>(); }},
 			{10, []() { return std::make_shared<TrapCard>(); }},
 			{10, []() { return std::make_shared<ActiveEnemyCard>(); }},

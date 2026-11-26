@@ -1,6 +1,8 @@
 #pragma once
 
+#include <deque>
 #include <memory>
+#include <queue>
 #include <raylib.h>
 #include <vector>
 
@@ -26,6 +28,9 @@ class Board {
 
 	BoardActionResult HandleSwipe(Vector2 direction);
 
+	void extracted();
+	void SpawnCard(const std::shared_ptr<Card> &cardToSpawn);
+
 	std::shared_ptr<PlayerCard> GetPlayer();
 
 	std::shared_ptr<Card> GetCellAtPosition(Vector2 posistion);
@@ -40,9 +45,12 @@ class Board {
 
 	Vector2 GetPlayerPos();
 
+	std::shared_ptr<Card> GetCardToSpawn();
 	std::shared_ptr<Card> GetRandomCard();
 
 	std::vector<std::vector<std::shared_ptr<Card>>> board;
+
+	std::deque<std::shared_ptr<Card>> cardsSpawnQueue;
 
 	Rectangle touchRec{};
 
