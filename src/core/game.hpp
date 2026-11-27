@@ -37,6 +37,11 @@ class Game {
   private:
 	void RenderLose();
 	void UpdateButtonPos();
+
+	void UpdateBoardState();
+	void UpdatePickablesState();
+	void UpdateTargettingState();
+
 	GameState currentState;
 
 	Board board;

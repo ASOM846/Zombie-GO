@@ -1,7 +1,6 @@
 #include "game.hpp"
 #include "board.hpp"
 #include <algorithm>
-#include <iostream>
 #include <memory>
 #include <raylib.h>
 #include <raymath.h>
@@ -63,77 +62,13 @@ void Game::Update() {
 
 	switch (currentState) {
 	case GameState::BOARD:
-		if (CheckCollisionPointRec(gestureInput.GetTouchPointStart(),
-								   board.GetTouchRec()) &&
-			(gestureInput.GetGestureRecorded() != GESTURE_NONE)) {
-			if (gestureInput.GetGestureRecorded() !=
-				gestureInput.GetLastGestureRecorded()) {
-
-				Vector2 direction{};
-
-				switch (gestureInput.GetGestureRecorded()) {
-				case GESTURE_SWIPE_DOWN:
-					direction = {.x = 0, .y = 1};
-					break;
-				case GESTURE_SWIPE_UP:
-					direction = {.x = 0, .y = -1};
-					break;
-				case GESTURE_SWIPE_LEFT:
-					direction = {.x = -1, .y = 0};
-					break;
-				case GESTURE_SWIPE_RIGHT:
-					direction = {.x = 1, .y = 0};
-					break;
-				default:
-					break;
-				}
-
-				BoardActionResult actionResult = board.HandleSwipe(direction);
-				wasActionTaken = actionResult.turnConsumed;
-
-				if (actionResult.event == GameEvent::ADVANCE_ROOM) {
-					board.AdvanceRoom();
-				}
-
-				screenShake.trigger();
-			}
-		}
-
+		UpdateBoardState();
 		break;
 	case GameState::SPELLS:
-		selectedSpell = spellPage.UpdateAndGetSelected(*board.GetPlayer());
-
-		if (selectedSpell != nullptr) {
-			currentState = GameState::TARGETTING;
-		}
-
+		UpdatePickablesState();
 		break;
 	case GameState::TARGETTING:
-		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-			std::shared_ptr<Card> target =
-				board.GetCellAtPosition(GetMousePosition());
-
-			if (target == nullptr) {
-				currentState = GameState::BOARD;
-				selectedSpell = nullptr;
-			}
-
-			if (target != nullptr && selectedSpell != nullptr) {
-				if (selectedSpell->Interact(target)) {
-					auto &spells = board.GetPlayer()->pickables;
-
-					auto it =
-						std::find(spells.begin(), spells.end(), selectedSpell);
-
-					if (it != spells.end()) {
-						spells.erase(it);
-					}
-				}
-
-				currentState = GameState::BOARD;
-				selectedSpell = nullptr;
-			}
-		}
+		UpdateTargettingState();
 		break;
 	case GameState::RETURN_TO_MENU:
 		break;
@@ -218,4 +153,79 @@ void Game::UpdateButtonPos() {
 		.y = static_cast<float>(GetScreenHeight() - 40 - btnHeight),
 		.width = static_cast<float>(btnWidth),
 		.height = static_cast<float>(btnHeight)};
+}
+
+void Game::UpdateBoardState() {
+	if (CheckCollisionPointRec(gestureInput.GetTouchPointStart(),
+							   board.GetTouchRec()) &&
+		(gestureInput.GetGestureRecorded() != GESTURE_NONE)) {
+		if (gestureInput.GetGestureRecorded() !=
+			gestureInput.GetLastGestureRecorded()) {
+
+			Vector2 direction{};
+
+			switch (gestureInput.GetGestureRecorded()) {
+			case GESTURE_SWIPE_DOWN:
+				direction = {.x = 0, .y = 1};
+				break;
+			case GESTURE_SWIPE_UP:
+				direction = {.x = 0, .y = -1};
+				break;
+			case GESTURE_SWIPE_LEFT:
+				direction = {.x = -1, .y = 0};
+				break;
+			case GESTURE_SWIPE_RIGHT:
+				direction = {.x = 1, .y = 0};
+				break;
+			default:
+				break;
+			}
+
+			BoardActionResult actionResult = board.HandleSwipe(direction);
+			wasActionTaken = actionResult.turnConsumed;
+
+			if (actionResult.event == GameEvent::ADVANCE_ROOM) {
+				board.AdvanceRoom();
+			}
+
+			screenShake.trigger();
+		}
+	}
+}
+
+void Game::UpdatePickablesState() {
+
+	selectedSpell = spellPage.UpdateAndGetSelected(*board.GetPlayer());
+
+	if (selectedSpell != nullptr) {
+		currentState = GameState::TARGETTING;
+	}
+}
+
+void Game::UpdateTargettingState() {
+	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+		std::shared_ptr<Card> target =
+			board.GetCellAtPosition(GetMousePosition());
+
+		if (target == nullptr) {
+			currentState = GameState::BOARD;
+			selectedSpell = nullptr;
+		}
+
+		if (target != nullptr && selectedSpell != nullptr) {
+			if (selectedSpell->Interact(target)) {
+				auto &spells = board.GetPlayer()->pickables;
+
+				auto it =
+					std::find(spells.begin(), spells.end(), selectedSpell);
+
+				if (it != spells.end()) {
+					spells.erase(it);
+				}
+			}
+
+			currentState = GameState::BOARD;
+			selectedSpell = nullptr;
+		}
+	}
 }
