@@ -3,7 +3,7 @@
 
 ExitCard::ExitCard() {
 	name = "EXIT";
-	textureId = TextureId::FLASK_2;
+	textureId = TextureId::DOOR_0;
 }
 
 void ExitCard::RenderContent(Vector2 position, Vector2 cellSize,

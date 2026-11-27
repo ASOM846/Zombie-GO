@@ -12,6 +12,8 @@ enum class TextureId {
 
 	VIGNETTE_0,
 
+	DOOR_0,
+
 	TRAP_0,
 
 	MOLOTOW_0,
@@ -64,6 +66,8 @@ class TextureManager {
 		load(TextureId::BCG_0, "assets/bcg0.png");
 
 		load(TextureId::VIGNETTE_0, "assets/vignette0.png");
+
+		load(TextureId::DOOR_0, "assets/door0.png");
 
 		load(TextureId::TRAP_0, "assets/trap0.png");
 

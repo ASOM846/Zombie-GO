@@ -3,7 +3,6 @@
 #include "../entity/card/chestCard.hpp"
 #include "../entity/card/coinCard.hpp"
 #include "../entity/card/enemyCard.hpp"
-#include "../entity/card/exitCard.hpp"
 #include "../entity/card/playerCard.hpp"
 #include "../entity/card/spellRecepieCard.hpp"
 #include "../entity/card/trapCard.hpp"
