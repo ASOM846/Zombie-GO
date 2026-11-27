@@ -92,7 +92,7 @@ void Game::Update() {
 				wasActionTaken = actionResult.turnConsumed;
 
 				if (actionResult.event == GameEvent::ADVANCE_ROOM) {
-					board.Reset();
+					board.AdvanceRoom();
 				}
 
 				screenShake.trigger();

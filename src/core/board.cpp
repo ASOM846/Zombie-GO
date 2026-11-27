@@ -182,6 +182,24 @@ void Board::SpawnCard(const std::shared_ptr<Card> &cardToSpawn) {
 	cardsSpawnQueue.push_back(cardToSpawn);
 }
 
+void Board::AdvanceRoom() {
+	Vector2 playerPos = GetPlayerPos();
+
+	int newPlayerX = std::floor(static_cast<float>(boardX / 2));
+	int newPlayerY = std::floor(static_cast<float>(boardY / 2));
+
+	board[newPlayerY][newPlayerX] = board[playerPos.y][playerPos.x];
+
+	for (int y = 0; y < boardY; y++) {
+		for (int x = 0; x < boardX; x++) {
+			if (x == newPlayerX && y == newPlayerY)
+				continue;
+
+			board[y][x] = GetCardToSpawn();
+		}
+	}
+}
+
 std::shared_ptr<PlayerCard> Board::GetPlayer() {
 	Vector2 pos = GetPlayerPos();
 	return std::dynamic_pointer_cast<PlayerCard>(board[pos.y][pos.x]);

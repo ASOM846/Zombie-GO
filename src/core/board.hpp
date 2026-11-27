@@ -28,8 +28,8 @@ class Board {
 
 	BoardActionResult HandleSwipe(Vector2 direction);
 
-	void extracted();
 	void SpawnCard(const std::shared_ptr<Card> &cardToSpawn);
+	void AdvanceRoom();
 
 	std::shared_ptr<PlayerCard> GetPlayer();
 
