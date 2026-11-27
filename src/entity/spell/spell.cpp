@@ -27,12 +27,7 @@ void MedkidPickable::RenderContent(Vector2 offset, Vector2 size) {
 bool MedkidPickable::Interact(std::shared_ptr<Card> target) {
 
 	if (auto playerTarget = std::dynamic_pointer_cast<PlayerCard>(target)) {
-		playerTarget->hp += healAmount;
-		return true;
-	}
-
-	if (auto enemyTarget = std::dynamic_pointer_cast<EnemyCard>(target)) {
-		enemyTarget->hp += healAmount;
+		playerTarget->Heal(healAmount);
 		return true;
 	}
 
@@ -41,10 +36,6 @@ bool MedkidPickable::Interact(std::shared_ptr<Card> target) {
 
 bool MedkidPickable::ShouldHighlight(std::shared_ptr<Card> &target) {
 	if (auto playerTarget = std::dynamic_pointer_cast<PlayerCard>(target)) {
-		return true;
-	}
-
-	if (auto enemyTarget = std::dynamic_pointer_cast<EnemyCard>(target)) {
 		return true;
 	}
 
@@ -63,18 +54,13 @@ void MolotowPickable::RenderContent(Vector2 offset, Vector2 size) {
 }
 
 bool MolotowPickable::Interact(std::shared_ptr<Card> target) {
-	if (auto playerTarget = std::dynamic_pointer_cast<PlayerCard>(target)) {
-		playerTarget->hp -= damageAmount;
-		return true;
-	}
-
 	if (auto enemyTarget = std::dynamic_pointer_cast<EnemyCard>(target)) {
-		enemyTarget->hp -= damageAmount;
+		enemyTarget->TakeDamage(damageAmount);
 		return true;
 	}
 
 	if (auto enemyTarget = std::dynamic_pointer_cast<ActiveEnemyCard>(target)) {
-		enemyTarget->hp -= damageAmount;
+		enemyTarget->TakeDamage(damageAmount);
 		return true;
 	}
 
@@ -82,10 +68,6 @@ bool MolotowPickable::Interact(std::shared_ptr<Card> target) {
 }
 
 bool MolotowPickable::ShouldHighlight(std::shared_ptr<Card> &target) {
-	if (auto playerTarget = std::dynamic_pointer_cast<PlayerCard>(target)) {
-		return true;
-	}
-
 	if (auto enemyTarget = std::dynamic_pointer_cast<EnemyCard>(target)) {
 		return true;
 	}

@@ -47,3 +47,9 @@ void PlayerCard::CollectCoin(int value) {
 		{static_cast<float>(GetScreenWidth() / 2), 40},
 		"+" + std::to_string(value), DARKGREEN);
 }
+
+void PlayerCard::Heal(int amount) {
+	hp += amount;
+
+	hp = std::max(hp, maxHp);
+}

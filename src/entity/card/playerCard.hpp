@@ -23,6 +23,8 @@ class PlayerCard : public Card {
 
 	void CollectCoin(int value);
 
+	void Heal(int amount);
+
 	std::shared_ptr<MeleWeaponCard> currentWeapon;
 
 	std::vector<std::shared_ptr<Pickable>> pickables;
