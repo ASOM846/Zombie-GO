@@ -13,6 +13,7 @@
 #include "../textureManager.hpp"
 
 #include <functional>
+#include <iostream>
 #include <memory>
 #include <raylib.h>
 #include <raymath.h>
@@ -107,9 +108,9 @@ BoardActionResult Board::HandleSwipe(Vector2 direction) {
 	Vector2 playerPos = GetPlayerPos();
 	Vector2 desiredPos = Vector2Add(playerPos, direction);
 
-	if (desiredPos.x < 0 || desiredPos.y < 0 || desiredPos.y > boardY ||
-		desiredPos.x > boardX) {
-		return {};
+	if (desiredPos.x < 0 || desiredPos.y < 0 || desiredPos.y == boardY ||
+		desiredPos.x == boardX) {
+		return {false};
 	}
 
 	auto player =
@@ -123,6 +124,8 @@ BoardActionResult Board::HandleSwipe(Vector2 direction) {
 		board[desiredPos.y][desiredPos.x] = std::make_shared<CoinCard>();
 		return {true};
 	}
+
+	std::cout << "wykonano\n";
 
 	if (target != nullptr) {
 		result = target->Interact(*player);
