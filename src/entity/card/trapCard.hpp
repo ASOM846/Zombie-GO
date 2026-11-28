@@ -14,7 +14,6 @@ class TrapCard : public Card {
 	[[nodiscard]] std::string GetBottomText() const override;
 
 	InteractionResult Interact(PlayerCard &player) override;
-	void AutoAction(PlayerCard &player) override {};
 
 	int attack;
 };

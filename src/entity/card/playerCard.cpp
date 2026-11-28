@@ -36,6 +36,20 @@ std::string PlayerCard::GetBottomText() const {
 	return std::to_string(hp) + "/" + std::to_string(maxHp);
 }
 
+int PlayerCard::GetMaxCounterLength() const {
+	if (currentWeapon) {
+		return currentWeapon->maxDurability;
+	}
+	return 0;
+}
+
+int PlayerCard::GetCurrentCounterLenght() const {
+	if (currentWeapon) {
+		return currentWeapon->currentDurability;
+	}
+	return 0;
+}
+
 InteractionResult PlayerCard::Interact(PlayerCard &player) {
 	return {.replace = true, .replaceInto = nullptr};
 }

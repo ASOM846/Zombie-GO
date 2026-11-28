@@ -5,6 +5,10 @@
 #include <raylib.h>
 #include <raymath.h>
 
+// TODO:
+// Enemies nie umierają jak na przykład przez molotow zpadnie im hp do 0
+//
+
 void Game::Init() {
 	textureManager.loadAll();
 

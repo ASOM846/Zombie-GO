@@ -2,7 +2,7 @@
 #include "card.hpp"
 #include "coinCard.hpp"
 #include "playerCard.hpp"
-#include <iostream>
+#include <raylib.h>
 
 ActiveEnemyCard::ActiveEnemyCard() {
 	hp = GetRandomValue(1, 6);
@@ -18,6 +18,9 @@ ActiveEnemyCard::ActiveEnemyCard() {
 
 	textureId = GetRandomTexture();
 	gradientColor = RED;
+
+	turnsToAttack = GetRandomValue(2, 4);
+	toAttackCounter = 0;
 }
 
 void ActiveEnemyCard::RenderContent(Vector2 offset, Vector2 cellSize,
@@ -29,6 +32,14 @@ std::string ActiveEnemyCard::GetTopText() const {
 
 std::string ActiveEnemyCard::GetBottomText() const {
 	return std::to_string(hp);
+}
+
+[[nodiscard]] int ActiveEnemyCard::GetMaxCounterLength() const {
+	return turnsToAttack;
+}
+
+[[nodiscard]] int ActiveEnemyCard::GetCurrentCounterLenght() const {
+	return toAttackCounter;
 }
 
 InteractionResult ActiveEnemyCard::Interact(PlayerCard &player) {
@@ -70,9 +81,18 @@ InteractionResult ActiveEnemyCard::Interact(PlayerCard &player) {
 			.replaceInto = std::make_shared<CoinCard>(startHp)};
 }
 
-void ActiveEnemyCard::AutoAction(PlayerCard &player) {
-	hp += 1;
-	if (GetRandomValue(1, 2) == 1) {
+InteractionResult ActiveEnemyCard::AutoAction(PlayerCard &player) {
+	if (toAttackCounter >= turnsToAttack) {
 		player.TakeDamage(1);
+		toAttackCounter = 0;
+	} else {
+		toAttackCounter++;
 	}
+
+	if (hp <= 0) {
+		return {
+			.replace = true, .replaceInto = nullptr, .event = GameEvent::NONE};
+	}
+
+	return {.replace = true, .replaceInto = nullptr, .event = GameEvent::NONE};
 }

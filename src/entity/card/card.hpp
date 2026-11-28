@@ -33,13 +33,19 @@ class Card {
 	[[nodiscard]] virtual std::string GetTopText() const = 0;
 	[[nodiscard]] virtual std::string GetBottomText() const = 0;
 
+	[[nodiscard]] virtual int GetMaxCounterLength() const { return 0; };
+	[[nodiscard]] virtual int GetCurrentCounterLenght() const { return 0; };
+
   protected:
 	virtual void RenderContent(Vector2 offset, Vector2 cellSize,
 							   TextureManager &tm) = 0;
 
   public:
 	virtual InteractionResult Interact(PlayerCard &player) = 0;
-	virtual void AutoAction(PlayerCard &player) = 0;
+	virtual InteractionResult AutoAction(PlayerCard &player) {
+		return {
+			.replace = false, .replaceInto = nullptr, .event = GameEvent::NONE};
+	}
 
 	virtual void TakeDamage(int value);
 

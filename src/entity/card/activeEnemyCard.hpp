@@ -13,8 +13,14 @@ class ActiveEnemyCard : public Card {
 	[[nodiscard]] std::string GetTopText() const override;
 	[[nodiscard]] std::string GetBottomText() const override;
 
+	[[nodiscard]] int GetMaxCounterLength() const;
+	[[nodiscard]] int GetCurrentCounterLenght() const;
+
 	InteractionResult Interact(PlayerCard &player) override;
-	void AutoAction(PlayerCard &player) override;
+	InteractionResult AutoAction(PlayerCard &player) override;
 
 	Color color;
+
+	int toAttackCounter;
+	int turnsToAttack;
 };

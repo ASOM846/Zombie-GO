@@ -168,28 +168,6 @@ inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 		if (playerCard->currentWeapon) {
 			float rectSize = 5;
 
-			auto weapon = playerCard->currentWeapon;
-
-			float numberOfSpacings = weapon->maxDurability + 1;
-
-			float spacingLength =
-				((width - (rectSize * weapon->maxDurability)) /
-				 numberOfSpacings);
-
-			for (int i = 0; i < weapon->maxDurability; i++) {
-				float x = spacingLength * (i + 1) + rectSize * i;
-
-				DrawRectangle(position.x + x, bottomSepY, rectSize, rectSize,
-							  shadow);
-			}
-
-			for (int i = 0; i < weapon->currentDurability; i++) {
-				float x = spacingLength * (i + 1) + rectSize * i;
-
-				DrawRectangle(position.x + x, bottomSepY, rectSize, rectSize,
-							  textColor);
-			}
-
 			const Texture2D &weaponTex =
 				tm.get(playerCard->currentWeapon->textureId);
 
@@ -212,6 +190,30 @@ inline void DrawCardBase(float centerX, float centerY, Vector2 position,
 
 			DrawTexturePro(weaponTex, weaponSource, weaponDest, {0.0f, 0.0f},
 						   0.0f, RAYWHITE);
+		}
+	}
+
+	if (card.GetMaxCounterLength() > 0) {
+		float rectSize = 5;
+
+		float numberOfSpacings = card.GetMaxCounterLength() + 1;
+
+		float spacingLength =
+			((width - (rectSize * card.GetMaxCounterLength())) /
+			 numberOfSpacings);
+
+		for (int i = 0; i < card.GetMaxCounterLength(); i++) {
+			float x = spacingLength * (i + 1) + rectSize * i;
+
+			DrawRectangle(position.x + x, bottomSepY, rectSize, rectSize,
+						  shadow);
+		}
+
+		for (int i = 0; i < card.GetCurrentCounterLenght(); i++) {
+			float x = spacingLength * (i + 1) + rectSize * i;
+
+			DrawRectangle(position.x + x, bottomSepY, rectSize, rectSize,
+						  textColor);
 		}
 	}
 }
